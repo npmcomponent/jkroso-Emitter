@@ -24,12 +24,14 @@ define(function () { 'use strict';
 
     Emitter.prototype = {
         publish : function (topic, data) {
-            var calls = this._callbacks
-            if ( calls ) {
+            var calls
+            if ( calls = this._callbacks ) {
                 calls = calls[topic]
-                var i = calls.length
-                while (i--) {
-                    calls[i].call(calls[--i], data)
+                if (calls) {
+                    var i = calls.length
+                    while (i--) {
+                        calls[i].call(calls[--i], data)
+                    }
                 }
             }
             return this
