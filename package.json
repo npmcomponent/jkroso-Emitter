@@ -19,7 +19,6 @@
 		}
 	],
 	"dependencies": [
-		"grunt-coffee"
-	],
-	"keywords": []
+		"grunt-requirejs"
+	]
 }

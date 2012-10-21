@@ -1,9 +1,37 @@
+<!doctype html>
 <html>
     <head>
         <title>Emitter</title>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <link rel="stylesheet" href="mocha.css" />
-        <script data-main="index.js" src="http://localhost/Libraries/requirejs/require.js"></script>
+        <link rel="stylesheet" href="vendor/mocha.css" />
+        <script type="text/javascript">
+            var require = {
+                shim : {
+                    mocha : {
+                        exports : 'mocha'
+                    },
+                    chai : {
+                        exports : 'chai'
+                    }
+                },
+                paths: {
+                    mocha: 'vendor/mocha',
+                    chai: 'vendor/chai'
+                }
+            }
+        </script>
+        <script src="vendor/require.js"></script>
+        <script type="text/javascript">
+            require(['require', 'mocha', 'chai'], function (require, mocha, chai) {
+                window.should = chai.Should()
+                window.expect = chai.expect
+
+                mocha.setup('bdd')
+                
+                require(['Emitter.test'], function () {
+                    mocha.run()
+                })
+            })
+        </script>
     </head>
     <body>
         <div id="mocha"></div>

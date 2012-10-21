@@ -11,39 +11,11 @@ module.exports = function(grunt) { 'use strict';
                 'Copyright (c) <%= grunt.template.today("yyyy") %> <%= pkg.author.name %>;' +
                 ' Licensed <%= _.pluck(pkg.licenses, "type").join(", ") %>'
         },
-        shell: {
-            docco: {
-                command: 'docco'+
-                ' lib/Observer.js'+
-                ' lib/Subscription.js'+
-                ' test/Observer_test.js',
-                stderr: true,
-                failOnError: true
-            },
-            _options: {
-                stdout: console.log
-            }
-        },
-        docco: {
-            files: [
-                'lib/Observer.js',
-                'lib/Subscription.js',
-                'test/Observer_test.js'
-            ]
-        },
-        clean: ['dist'],
         requirejs: {
-            baseUrl : ".",
-            paths : {
-                Subscription: 'lib/Subscription',
-                Observer: 'lib/Observer'
-            },
-            include:'Observer',
-            out : 'dist/Observer.js',
+            baseUrl : "src",
+            name: "Emitter",
+            out : 'dist/Emitter.js',
             optimize : "none"
-        },
-        qunit: {
-            files: ['test/Observer.html']
         },
         concat: {
             dist: {
@@ -60,14 +32,9 @@ module.exports = function(grunt) { 'use strict';
         watch: {
             files: '<config:lint.files>',
             tasks: 'lint qunit'
-        },
-        uglify: {}
-    });
+        }
+    })
 
-    // grunt.loadNpmTasks('grunt-contrib');
-    // grunt.loadNpmTasks('grunt-requirejs');
-    // grunt.loadNpmTasks('grunt-docco');
-    grunt.loadNpmTasks('grunt-coffee')
-    // grunt.registerTask('default', '')
-
+    grunt.loadNpmTasks('grunt-requirejs')
+    grunt.registerTask('default', 'requirejs concat min')
 };
