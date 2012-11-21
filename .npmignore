@@ -1,0 +1,6 @@
+*sublime-project
+*sublime-workspace
+ignore.conf
+node_modules
+dist
+tests

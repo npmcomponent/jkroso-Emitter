@@ -1,0 +1,11 @@
+{
+  "name": "Emitter",
+  "repo": "jkroso/Emitter",
+  "description": "A simple event emitter",
+  "version": "0.1.0",
+  "keywords": ["event", "emitter", "signal", "message"],
+  "dependencies": {},
+  "main": "src/index.js",
+  "scripts": ["src/index.js"],
+  "license": "MIT"
+}
