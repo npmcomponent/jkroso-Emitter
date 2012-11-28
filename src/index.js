@@ -2,28 +2,15 @@
 
 module.exports = Emitter
 
-function Emitter (obj) {
-    if ( !(this instanceof Emitter) ) return obj ? Emitter.mixin(obj) : new Emitter
-}
-
-var proto = Emitter.prototype
+function Emitter () {this._callbacks = {}}
 
 Emitter.new = function () {
     return new(this)
 }
 
-function resetCallbacks (obj) {
-    // Should not be enumerable
-    Object.defineProperty(obj, '_callbacks', {
-        value : Object.create(null),
-        writable : true,
-        configurable : true
-    })
-}
-
 Emitter.mixin = function (obj) {
     Object.keys(proto).forEach(function (key) {
-        Object.defineProperty(obj, key, { 
+        Object.defineProperty(obj, key, {
             value: proto[key], 
             writable:true,
             configurable:true 
@@ -32,7 +19,9 @@ Emitter.mixin = function (obj) {
     return obj
 }
 
-proto.publish = function (topic, data) {
+var proto = Emitter.prototype
+
+proto.emit = proto.publish = function (topic, data) {
     var calls
     if ((calls = this._callbacks) && (calls = calls[topic])) {
         topic = calls.length
@@ -44,30 +33,32 @@ proto.publish = function (topic, data) {
 }
 
 proto.on = function (topics, callback, context) {
-    if (!this._callbacks) resetCallbacks(this)
-    var calls = this._callbacks
-    topics.split(/\s+/).forEach(function (topic) {
+    topics = topics.split(/\s+/)
+    var calls = this._callbacks || (this._callbacks = {}),
+        i = topics.length
+
+    while (i--)
         // Push to the front of the array; Using concat to avoid mutating the old array
-        calls[topic] = [context || this, callback].concat(calls[topic] || [])
-    }, this)
+        calls[topics[i]] = [context || this, callback].concat(calls[topics[i]] || [])
+
     return this
 }
 
 proto.once = function (topics, callback, context) {
-    topics.split(/\s+/).forEach(function (topic) {
-        var self = this
+    var self = this
+    return this.on(
+        topics, 
         function on (data) {
-            self.off(topic, on)
-            callback.call(context, data)
-        }
-        this.on(topic, on, context)
-    }, this)
-    return this
+            self.off(topics, on)
+            return callback.call(context, data)
+        }, 
+        context
+    )
 }
 
 proto.off = function (topics, callback) {
-    var calls = this._callbacks
-    if ( calls ) {
+    var calls
+    if ( calls = this._callbacks ) {
         if ( topics ) {
             if ( callback ) {
                 topics.split(/\s+/).forEach(function (topic) {
@@ -84,13 +75,15 @@ proto.off = function (topics, callback) {
                         }
                     }                
                 })
-            } else {
+            } 
+            else {
                 topics.split(/\s+/).forEach(function (topic) {
                     delete calls[topic]
                 })
             }
-        } else {
-            resetCallbacks(this)
+        } 
+        else {
+            this._callbacks = {}
         }
     }
     return this

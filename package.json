@@ -1,6 +1,5 @@
 {
-  "name": "emitter",
-  "title": "Emitter",
+  "name": "jkroso-emitter",
   "description": "Basic pub/sub implementation. Designed to be used as a superclass or mixin",
   "version": "0.1.0",
   "homepage": "https://github.com/jkroso/Emitter",
@@ -26,7 +25,8 @@
     "test": "tests"
   },
   "scripts": {
-    "test": "mocha"
+    "test": "mocha -R spec tests/Emitter.test.js",
+    "build": "node build.js"
   },
   "keywords": [
     "event"

@@ -1,5 +1,5 @@
 {
-  "name": "Emitter",
+  "name": "emitter",
   "repo": "jkroso/Emitter",
   "description": "A simple event emitter",
   "version": "0.1.0",
