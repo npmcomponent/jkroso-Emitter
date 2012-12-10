@@ -1,7 +1,7 @@
 {
   "name": "jkroso-emitter",
   "description": "Basic pub/sub implementation. Designed to be used as a superclass or mixin",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "homepage": "https://github.com/jkroso/Emitter",
   "author": "Jakeb Rosoman <jkroso@gmail.com>",
   "repository": {
@@ -19,14 +19,13 @@
   "devDependencies": {
     "chai": "*",
     "mocha": "*",
-    "gluejs": "*"
   },
   "directories": {
     "test": "tests"
   },
   "scripts": {
-    "test": "mocha -R spec tests/Emitter.test.js",
-    "build": "node build.js"
+    "test": "mocha -R spec test/Emitter.test.js",
+    "build": "bigfile -e src/index.js -w dist/Emitter.js -pc"
   },
   "keywords": [
     "event"
