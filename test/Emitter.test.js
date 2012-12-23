@@ -4,12 +4,13 @@ var Emitter = require('../src/'),
 
 describe('Emitter', function () {
     var a
+    var sentinel = {}
     beforeEach(function () {
         a = new Emitter
     })
     describe('Instantiate', function () {
-        it('Should not throw any errors', function () {
-            new Emitter
+        it('Should be an instance of Emitter', function () {
+            new Emitter().should.be.an.instanceOf(Emitter)
         })
         it.skip('Should have no enumerable properties', function () {
             Object.keys(new Emitter).length.should.equal(0)
@@ -51,9 +52,28 @@ describe('Emitter', function () {
             a.publish('test')
         })
     })
-    describe('.publish(event, data)', function () {
-        it('Should fire in the order functions were subscribed')
-        it('Should call functions with their specified context')
+    describe('.emit(event, data)', function () {
+        it('Should fire in the order functions were subscribed', function () {
+            var c = 0
+            a.on('a', function () {
+                (++c).should.equal(1)
+            }).on('a', function () {
+                (++c).should.equal(2)
+            }).emit('a')
+            c.should.equal(2)
+        })
+        it('Should call functions with their specified context', function (done) {
+            a.on('test', function (d) {
+                this.should.equal(sentinel)
+                done()
+            }, sentinel).emit('test')
+        })
+        it('should pass data to each handler', function (done) {
+            a.on('test', function (d) {
+                d.should.equal(sentinel)
+                done()
+            }).emit('test', sentinel)
+        })
     })
     describe('.off(events, fn)', function () {
         it('Should remove only the specied fn and its context', function () {
@@ -77,8 +97,8 @@ describe('Emitter', function () {
             chai.should().not.exist(a._callbacks.test)
         })
         it('should should clear multiple events', function () {
-            a.on('one two three', function test () {})
-            a.off('one two')
+            a.on('one | two | three', function test () {})
+            a.off('one | two')
             should.not.exist(a._callbacks.one)
             a._callbacks.three.should.have.a.lengthOf(2)
         })
@@ -94,7 +114,7 @@ describe('Emitter', function () {
         })  
         it('should unsubsribe from all it was subsribed to', function () {
             var c = 0
-            a.once('one two three', function () {c++})
+            a.once('one | two | three', function () {c++})
             a.emit('two')
             a.emit('three')
             a.emit('one')
