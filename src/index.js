@@ -107,12 +107,14 @@ proto.once = function (topics, callback, context) {
  *   emitter.off() // clears all topics
  *   emitter.off('topic') // clears all handlers under 'topic'
  *   emitter.off('topic', fn) // removes fn from 'topic'
+ *   emitter.off('topic', fn, window) // removes fn from 'topic' with context of `window`
  *
- * @param {String} [topics] a list of topics seperated by pipes
- * @param {Function} [callback] the function to remove
+ * @param {String} [topics] filter subscriptions by topics
+ * @param {Function} [callback] filter subscriptions by === callback
+ * @param {Any} [context] filter by === context
  * @return {Self} [description]
  */
-proto.off = function (topics, callback) {
+proto.off = function (topics, callback, context) {
 	var calls = this._callbacks
 	if (!calls) return this
 	if (topics != null) {
@@ -125,10 +127,10 @@ proto.off = function (topics, callback) {
 				var i = events.length
 				while (i--)
 					if (events[i--] === callback) {
+						if (context && events[i] !== context) continue
 						events = events.slice()
 						events.splice(i, 2)
 						calls[topics[len]] = events
-						break
 					}
 			}
 		else
