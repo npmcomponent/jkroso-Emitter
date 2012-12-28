@@ -1,7 +1,7 @@
 {
   "name": "jkroso-emitter",
-  "description": "Basic event emitter. Designed to be used as a superclass or mixin",
-  "version": "0.2.0",
+  "description": "Basic event emitter",
+  "version": "0.4.0",
   "homepage": "https://github.com/jkroso/Emitter",
   "author": "Jakeb Rosoman <jkroso@gmail.com>",
   "repository": {
