@@ -1,6 +1,6 @@
 # Emitter
 
-A simple but fairly convenient pub/sub implementation. Similar to backbone events
+A simple event emitter. I implemented my own so I could optimise for performance and implement new features as I require. The main advantage of this implementation is its handling of context. It allows you to specify a context when you create a subscription (a la backbone.js) but also takes this into account when unsubscribing. So when unsubscribing you have three levels of specificity available to you. topic(s), topic(s)+callback, and topic(s)+callback+context. This makes it possible to work with methods defined on an objects prototype without wrapping them since you now have a way of differentiating between subscriptions belonging to different instances.
 
 ## Getting Started
 Download the [production version][min] or the [development version][max].
@@ -23,7 +23,7 @@ with npm
   - [proto.emit](#protoemit)
   - [proto.on()](#protoontopicsstringcallbackfunctioncontextobject)
   - [proto.once()](#protoonce)
-  - [proto.off()](#protoofftopicsstringcallbackfunction)
+  - [proto.off()](#protoofftopicsstringcallbackfunctioncontextany)
 
 ## Emitter()
 
@@ -62,7 +62,7 @@ emitter.on('a | b', function(data){})
 
   Add the subscription but insure it never called more than once
 
-## proto.off([topics]:String, [callback]:Function)
+## proto.off([topics]:String, [callback]:Function, [context]:Any)
 
   Remove subscriptions
   
@@ -70,6 +70,7 @@ emitter.on('a | b', function(data){})
 emitter.off() // clears all topics
 emitter.off('topic') // clears all handlers under 'topic'
 emitter.off('topic', fn) // removes fn from 'topic'
+emitter.off('topic', fn, window) // removes fn from 'topic' with context of `window`
 ```
 
 ## Contributing
