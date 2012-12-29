@@ -21,24 +21,11 @@ Emitter.new = function () {
  * @return {obj} that you passed in
  */
 Emitter.mixin = function (obj) {
-	Object.keys(proto).forEach(function (key) {
-		Object.defineProperty(obj, key, {
-			value: proto[key], 
-			writable:true,
-			configurable:true 
-		})
-	})
+	Emitter.call(obj)
+	for (var key in proto)
+		obj[key] = proto[key]
 	return obj
 }
-
-/*!
- * Event seperator
- * 
- *   event | type
- *   event || type
- *   event|type
- */
-var splitter = /\s*\|{1,2}\s*/
 
 var proto = Emitter.prototype
 
@@ -49,40 +36,46 @@ var proto = Emitter.prototype
  *   
  * @param {String} topic the events topic
  * @param {Any} data to be passed to all handlers
- * @return {Self}
  */
 proto.emit = 
 proto.publish = function (topic, data) {
-	var calls
-	if ((calls = this._callbacks) && (calls = calls[topic])) {
-		topic = calls.length
-		while (topic--)
-			calls[topic].call(calls[--topic], data)
-	}
-	return this
+	var calls = this._callbacks[topic]
+	if (!calls) return
+	topic = calls.length
+	while (topic--)
+		calls[topic].call(calls[--topic], data)
 }
 
 /**
  * Add a subscription under a topic name
  *
  *   emitter.on('event', function(data){})
- *   emitter.on('a | b', function(data){})
+ *   emitter.on('event') // implies emitter.on('event', emitter.onEvent)
+ *   emitter.on('event', function(){this === emitter}, emitter)
+ *   emitter.on('event', function(){this === emitter}) // the current context is the default
  *
- * @param {String} topics a pipe seperated string of event types
+ * @param {String} topic
  * @param {Function} callback to be called when the topic is emitted
  * @param {Object} context to call the the function with
- * @return {Self}
+ * @return {callback} whatever function was subscribed
  */
-proto.on = function (topics, callback, context) {
-	topics = topics.split(splitter)
-	var calls = this._callbacks || (this._callbacks = {}),
-		i = topics.length
+proto.on = function (topic, callback, context) {
+	var calls = this._callbacks
+	if (callback == null) {
+		callback = this['on'+capitalize(topic)]
+		if (!callback) throw new Error('Could not find a method for '+topic)
+	}
+	// Push to the front of the array; Using concat to avoid mutating the old array
+	calls[topic] = [context || this, callback].concat(calls[topic] || [])
 
-	while (i--)
-		// Push to the front of the array; Using concat to avoid mutating the old array
-		calls[topics[i]] = [context || this, callback].concat(calls[topics[i]] || [])
+	return callback
+}
 
-	return this
+/**
+ * Capitalize the first letter of a word
+ */
+function capitalize (word) {
+	return word[0].toUpperCase() + word.slice(1)
 }
 
 /**
@@ -109,34 +102,28 @@ proto.once = function (topics, callback, context) {
  *   emitter.off('topic', fn) // removes fn from 'topic'
  *   emitter.off('topic', fn, window) // removes fn from 'topic' with context of `window`
  *
- * @param {String} [topics] filter subscriptions by topics
- * @param {Function} [callback] filter subscriptions by === callback
+ * @param {String} [topic] filter by === topic
+ * @param {Function} [callback] filter by === callback
  * @param {Any} [context] filter by === context
- * @return {Self} [description]
  */
-proto.off = function (topics, callback, context) {
-	var calls = this._callbacks
-	if (!calls) return this
-	if (topics != null) {
-		topics = topics.split(splitter)
-		var len = topics.length
-		if (callback)
-			while (len--) {
-				var events = calls[topics[len]]
-				if (!events) return
-				var i = events.length
-				while (i--)
-					if (events[i--] === callback) {
-						if (context && events[i] !== context) continue
-						events = events.slice()
-						events.splice(i, 2)
-						calls[topics[len]] = events
-					}
-			}
-		else
-			while (len--) delete calls[topics[len]]
-	} 
-	else
+proto.off = function (topic, callback, context) {
+	if (topic == null)
 		this._callbacks = {}
-	return this
+	else {
+		var calls = this._callbacks
+		if (callback) {
+			var events = calls[topic]
+			if (!events) return
+			var i = events.length
+			while (i--)
+				if (events[i--] === callback) {
+					if (context && events[i] !== context) continue
+					events = events.slice()
+					events.splice(i, 2)
+					calls[topic] = events
+				}
+		}
+		else
+			delete calls[topic]
+	}
 }

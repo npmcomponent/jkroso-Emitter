@@ -42,15 +42,46 @@ describe('Emitter', function (a) {
 		it('Should be an instance of Emitter', function () {
 			new Emitter().should.be.an.instanceOf(Emitter)
 		})
-		it.skip('Should have no enumerable properties', function () {
-			Object.keys(new Emitter).length.should.equal(0)
+	})
+
+	describe('Mixin', function () {
+		it('should return the target object', function () {
+			var o = {}
+			Emitter.mixin(o).should.equal(o)
+		})
+		it('should look like an Emitter instance', function () {
+			Emitter.mixin({}).should.have.keys([
+				'_callbacks',
+				'emit',
+				'on',
+				'off',
+				'once',
+				'publish'
+			])
+		})
+	})
+
+	describe('.on(event)', function () {
+		it('should default to on[Event]', function () {
+			a.onEvent = noopA
+			a.on('event')
+			hasSubscription('event', noopA)
+		})
+		it('should return the resolved method', function () {
+			a.onEvent = noopA
+			a.on('event').should.equal(noopA)
+		})
+		it('should throw if no method can be found', function () {
+			(function () {
+				a.on('event')
+			}).should.throw(Error, /find a method/i)
 		})
 	})
 
 	describe('.on(events, fn, context)', function () {
 		it('Should register the callback', function () {
-			a.on('test', noopA, a)
-			hasSubscription('test', noopA, a)
+			a.on('test', noopA)
+			hasSubscription('test', noopA)
 		})
 		it('Should be able to subscribe multiple functions per event', function () {
 			a.on('test', noopA, a)
@@ -62,8 +93,8 @@ describe('Emitter', function (a) {
 			a.on('test', noopA)
 			hasSubscription('test', noopA, a)
 		})
-		it.skip('should return the function which was subscribed', function () {
-			
+		it('should return the function which was subscribed', function () {
+			a.on('test', noopA).should.equal(noopA)
 		})
 	})
 
@@ -72,22 +103,26 @@ describe('Emitter', function (a) {
 			var c = 0
 			a.on('a', function () {
 				(++c).should.equal(1)
-			}).on('a', function () {
+			})
+			a.on('a', function () {
 				(++c).should.equal(2)
-			}).emit('a')
+			})
+			a.emit('a')
 			c.should.equal(2)
 		})
 		it('Should call functions with their specified context', function (done) {
 			a.on('test', function (d) {
 				this.should.equal(sentinel)
 				done()
-			}, sentinel).emit('test')
+			}, sentinel)
+			a.emit('test')
 		})
 		it('should pass data to each handler', function (done) {
 			a.on('test', function (d) {
 				d.should.equal(sentinel)
 				done()
-			}).emit('test', sentinel)
+			})
+			a.emit('test', sentinel)
 		})
 	})
 
@@ -106,13 +141,6 @@ describe('Emitter', function (a) {
 			a.on('test', function () {})
 			a.off('test')
 			should.not.exist(a._callbacks.test)
-		})
-		it('should should clear multiple events', function () {
-			a.on('one | two | three', noopA)
-			a.off('one | two')
-			hasSubscription('three', noopA)
-			notSubscription('one', noopA)
-			notSubscription('two', noopA)
 		})
 	})
 
@@ -137,7 +165,7 @@ describe('Emitter', function (a) {
 		})
 	})
 	
-	describe('.off(topics, fn, context)', function () {
+	describe('.off(topic, fn, context)', function () {
 		it('should remove only the subscriptions which match both context and fn', function () {
 			a.on('test', noopA, noopB)
 			a.on('test', noopA, sentinel)
@@ -156,14 +184,6 @@ describe('Emitter', function (a) {
 			a.emit('test')
 			c.should.equal(1)
 			notSubscription('two', fn)
-		})  
-		it('should unsubsribe from all it was subsribed to', function () {
-			var c = 0
-			a.once('one | two | three', function () {c++})
-			a.emit('two')
-			a.emit('three')
-			a.emit('one')
-			c.should.equal(1)
 		})
 	})
 })
