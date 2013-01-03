@@ -37,8 +37,8 @@ var proto = Emitter.prototype
  * @param {String} topic the events topic
  * @param {Any} data to be passed to all handlers
  */
-proto.emit = 
-proto.publish = function (topic, data) {
+proto.publish =
+proto.emit = function (topic, data) {
 	var calls = this._callbacks[topic]
 	if (!calls) return
 	topic = calls.length
@@ -71,7 +71,7 @@ proto.on = function (topic, callback, context) {
 	return callback
 }
 
-/**
+/*!
  * Capitalize the first letter of a word
  */
 function capitalize (word) {
@@ -98,13 +98,13 @@ proto.once = function (topics, callback, context) {
  * Remove subscriptions
  *
  *   emitter.off() // clears all topics
- *   emitter.off('topic') // clears all handlers under 'topic'
- *   emitter.off('topic', fn) // removes fn from 'topic'
- *   emitter.off('topic', fn, window) // removes fn from 'topic' with context of `window`
+ *   emitter.off('topic') // clears all handlers from the topic 'topic'
+ *   emitter.off('topic', fn) // as above but only if the handler === fn
+ *   emitter.off('topic', fn, window) // as above but only if the context is `window`
  *
- * @param {String} [topic] filter by === topic
- * @param {Function} [callback] filter by === callback
- * @param {Any} [context] filter by === context
+ * @param {String} [topic]
+ * @param {Function} [callback]
+ * @param {Any} [context]
  */
 proto.off = function (topic, callback, context) {
 	if (topic == null)

@@ -1,3 +1,5 @@
+SRC = cat src/index.js
+
 clean:
 	@rm -rf dist
 
@@ -9,7 +11,10 @@ test:
 
 docs:
 	@cat docs/head.md > Readme.md
-	@dox --api < src/index.js >> Readme.md
+	@cat src/index.js \
+	| sed s/proto\.publish.*// \
+	| sed s/^proto/Emitter.prototype/ \
+	| dox --api >> Readme.md
 	@cat docs/tail.md >> Readme.md
 
 .PHONY: clean test build docs

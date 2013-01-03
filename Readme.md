@@ -1,6 +1,28 @@
 # Emitter
 
-A simple event emitter. I implemented my own so I could optimise for performance and implement new features as I require. The main advantage of this implementation is its handling of context. It allows you to specify a context when you create a subscription (a la backbone.js) but also takes this into account when unsubscribing. So when unsubscribing you have three levels of specificity available to you. topic(s), topic(s)+callback, and topic(s)+callback+context. This makes it possible to work with methods defined on an objects prototype without wrapping them since you now have a way of differentiating between subscriptions belonging to different instances.
+A simple event emitter. I implemented my own so I could optimise for performance and implement new features as I require. The main advantage of this implementation is its handling of context. It allows you to specify a context when you create a subscription a la backbone.js but also takes this into account when unsubscribing. So when unsubscribing you have three levels of specificity available to you. topic, topic+callback, and topic+callback+context. This makes it possible to work with methods defined on an objects prototype without wrapping them since you now have a way of differentiating between subscriptions belonging to different instances.
+
+Example:
+```js
+function O (name) {this.name = name}
+O.prototype.onResize = function(){
+  console.log('Hi im an O by the name '+this.name)
+}
+
+var a = new O('olivia')
+var b = new O('obby')
+
+viewport.on('resize', a.onResize, a)
+viewport.on('resize', b.onResize, b)
+viewport.emit('resize') 
+// => Hi im an O by the name olivia
+// => Hi im an O by the name obby
+
+viewport.off('resize', a.onResize, a)
+
+viewport.emit('resize') 
+// => Hi im an O by the name obby
+```
 
 ## Getting Started
 
@@ -16,11 +38,10 @@ with the latest npm
   - [Emitter()](#emitter)
   - [Emitter.new()](#emitternew)
   - [Emitter.mixin()](#emittermixinobjobject)
-  - [proto.emit](#protoemit)
-  - [proto.on()](#protoontopicstringcallbackfunctioncontextobject)
-  - [capitalize()](#capitalize)
-  - [proto.once()](#protoonce)
-  - [proto.off()](#protoofftopicstringcallbackfunctioncontextany)
+  - [Emitter.emit()](#emitteremittopicstringdataany)
+  - [Emitter.on()](#emitterontopicstringcallbackfunctioncontextobject)
+  - [Emitter.once()](#emitteronce)
+  - [Emitter.off()](#emitterofftopicstringcallbackfunctioncontextany)
 
 ## Emitter()
 
@@ -38,7 +59,7 @@ var emitter = new Emitter
 
   Add emitter behavior to any object
 
-## proto.emit
+## Emitter.emit(topic:String, data:Any)
 
   Generate an event
   
@@ -46,7 +67,7 @@ var emitter = new Emitter
 emitter.emit('event', new Date)
 ```
 
-## proto.on(topic:String, callback:Function, context:Object)
+## Emitter.on(topic:String, callback:Function, context:Object)
 
   Add a subscription under a topic name
   
@@ -57,23 +78,19 @@ emitter.on('event', function(){this === emitter}, emitter)
 emitter.on('event', function(){this === emitter}) // the current context is the default
 ```
 
-## capitalize()
-
-  Capitalize the first letter of a word
-
-## proto.once()
+## Emitter.once()
 
   Add the subscription but insure it never called more than once
 
-## proto.off([topic]:String, [callback]:Function, [context]:Any)
+## Emitter.off([topic]:String, [callback]:Function, [context]:Any)
 
   Remove subscriptions
   
 ```js
 emitter.off() // clears all topics
-emitter.off('topic') // clears all handlers under 'topic'
-emitter.off('topic', fn) // removes fn from 'topic'
-emitter.off('topic', fn, window) // removes fn from 'topic' with context of `window`
+emitter.off('topic') // clears all handlers from the topic 'topic'
+emitter.off('topic', fn) // as above but only if the handler === fn
+emitter.off('topic', fn, window) // as above but only if the context is `window`
 ```
 
 ## Contributing
@@ -87,5 +104,25 @@ v0.5.0 29/12/2012
 - can default methods
 
 ## License
-Copyright (c) 2012 Jakeb Rosoman  
-Licensed under the MIT license.
+Copyright (c) 2012 Jakeb Rosoman
+
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the
+Software is furnished to do so, subject to the following
+conditions:
+
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
