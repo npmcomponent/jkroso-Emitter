@@ -5,27 +5,8 @@ module.exports = Emitter
  *
  *   var emitter = new Emitter
  */
+
 function Emitter () {this._callbacks = {}}
-
-/**
- * An alternative constructor syntax
- */
-Emitter.new = function () {
-	return new(this)
-}
-
-/**
- * Add emitter behavior to any object
- * 
- * @param {Object} obj to recieve Emitter methods
- * @return {obj} that you passed in
- */
-Emitter.mixin = function (obj) {
-	Emitter.call(obj)
-	for (var key in proto)
-		obj[key] = proto[key]
-	return obj
-}
 
 var proto = Emitter.prototype
 
@@ -37,13 +18,11 @@ var proto = Emitter.prototype
  * @param {String} topic the events topic
  * @param {Any} data to be passed to all handlers
  */
-proto.publish =
+
 proto.emit = function (topic, data) {
-	var calls = this._callbacks[topic]
-	if (!calls) return
-	topic = calls.length
-	while (topic--)
-		calls[topic].call(calls[--topic], data)
+	if (!(topic = this._callbacks[topic])) return
+	var i = topic.length
+	while (i--) topic[i].call(topic[--i], data)
 }
 
 /**
@@ -59,6 +38,7 @@ proto.emit = function (topic, data) {
  * @param {Object} context to call the the function with
  * @return {callback} whatever function was subscribed
  */
+
 proto.on = function (topic, callback, context) {
 	var calls = this._callbacks
 	if (callback == null) {
@@ -74,14 +54,16 @@ proto.on = function (topic, callback, context) {
 /*!
  * Capitalize the first letter of a word
  */
+
 function capitalize (word) {
 	return word[0].toUpperCase() + word.slice(1)
 }
 
 /**
- * Add the subscription but insure it never called more than once
+ * Add the subscription but insure its never called more than once
  * @see Emitter#on
  */
+
 proto.once = function (topics, callback, context) {
 	var self = this
 	return this.on(
@@ -106,24 +88,26 @@ proto.once = function (topics, callback, context) {
  * @param {Function} [callback]
  * @param {Any} [context]
  */
+
 proto.off = function (topic, callback, context) {
-	if (topic == null)
+	if (topic == null) {
 		this._callbacks = {}
-	else {
+	} else {
 		var calls = this._callbacks
 		if (callback) {
 			var events = calls[topic]
 			if (!events) return
 			var i = events.length
-			while (i--)
+			while (i--) {
 				if (events[i--] === callback) {
 					if (context && events[i] !== context) continue
 					events = events.slice()
 					events.splice(i, 2)
 					calls[topic] = events
 				}
-		}
-		else
+			}
+		} else {
 			delete calls[topic]
+		}
 	}
 }
