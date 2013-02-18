@@ -43,35 +43,18 @@ describe('Instantiate', function () {
 	})
 })
 
-describe.skip('Mixin', function () {
+describe('Mixin', function () {
 	it('should return the target object', function () {
 		var o = {}
-		Emitter.mixin(o).should.equal(o)
+		Emitter(o).should.equal(o)
 	})
+
 	it('should look like an Emitter instance', function () {
-		Emitter.mixin({}).should.have.keys([
+		Emitter({}).should.have.keys([
 			'emit',
 			'on',
-			'off',
-			'once',
+			'off'
 		])
-	})
-})
-
-describe('.on(event)', function () {
-	it('should default to on[Event]', function () {
-		a.onEvent = noopA
-		a.on('event')
-		hasSubscription('event', noopA)
-	})
-	it('should return the resolved method', function () {
-		a.onEvent = noopA
-		a.on('event').should.equal(noopA)
-	})
-	it('should throw if no method can be found', function () {
-		(function () {
-			a.on('event')
-		}).should.throw(Error, /find a method/i)
 	})
 })
 
@@ -80,33 +63,40 @@ describe('.on(events, fn, context)', function () {
 		a.on('test', noopA)
 		hasSubscription('test', noopA)
 	})
+
 	it('Should be able to subscribe multiple functions per event', function () {
 		a.on('test', noopA, a)
 		a.on('test', noopB, a)
 		hasSubscription('test', noopA, a)
 		hasSubscription('test', noopB, a)
 	})
+
 	it('Should default the context to the current this value', function () {
 		a.on('test', noopA)
 		hasSubscription('test', noopA, a)
 	})
+
 	it('should return the function which was subscribed', function () {
 		a.on('test', noopA).should.equal(noopA)
 	})
 })
 
-describe('.emit(event, data)', function () {
+describe('.emit(event [, ...])', function () {
 	it('Should fire in the order functions were subscribed', function () {
 		var c = 0
+		
 		a.on('a', function () {
 			(++c).should.equal(1)
 		})
+		
 		a.on('a', function () {
 			(++c).should.equal(2)
 		})
+		
 		a.emit('a')
 		c.should.equal(2)
 	})
+	
 	it('Should call functions with their specified context', function (done) {
 		a.on('test', function (d) {
 			this.should.equal(sentinel)
@@ -114,12 +104,25 @@ describe('.emit(event, data)', function () {
 		}, sentinel)
 		a.emit('test')
 	})
+	
 	it('should pass data to each handler', function (done) {
 		a.on('test', function (d) {
 			d.should.equal(sentinel)
 			done()
 		})
 		a.emit('test', sentinel)
+	})
+
+	it('should pass all extra arguments to the handler', function () {
+		a.on('a', function () {
+			arguments.should.deep.equal([1,2,3,4,5])
+		})
+		a.emit('a', 1,2,3,4,5)
+
+		a.on('b',function () {
+			arguments.should.deep.equal([1,2])
+		})
+		a.emit('b', 1,2)
 	})
 })
 
@@ -169,17 +172,5 @@ describe('.off(topic, fn, context)', function () {
 		a.off('test', noopA, sentinel)
 		notSubscription('test', noopA, sentinel)
 		hasSubscription('test', noopA, noopB)
-	})
-})
-
-describe('.once(events, fn)', function () {
-	it('Should only fire once', function () {
-		var c = 0
-		function fn () {c++}
-		a.once('test', fn)    
-		a.emit('test')
-		a.emit('test')
-		c.should.equal(1)
-		notSubscription('two', fn)
 	})
 })

@@ -1,28 +1,53 @@
+
+var slice = require('sliced')
+
 module.exports = Emitter
 
 /**
- * Generate an instance of Emitter
+ * Generate a new Emitter or mixin methods to `obj`
  *
  *   var emitter = new Emitter
+ *   var emitter = Emitter({})
  */
 
-function Emitter () {this._callbacks = {}}
+function Emitter (obj) {
+	if (obj) {
+		for (var prop in proto) {
+			obj[prop] = proto[prop]
+		}
+		return obj
+	}
+}
 
 var proto = Emitter.prototype
 
 /**
- * Generate an event
+ * Generate an event. All arguments after `topic` will be passed to
+ * the handlers
  *
  *   emitter.emit('event', new Date)
  *   
  * @param {String} topic the events topic
- * @param {Any} data to be passed to all handlers
+ * @param {Any} [...]
  */
 
-proto.emit = function (topic, data) {
-	if (!(topic = this._callbacks[topic])) return
+proto.emit = function (topic, a, b, c) {
+	var cbs = this._callbacks
+	if (!(cbs && (topic = cbs[topic]))) return
+	
 	var i = topic.length
-	while (i--) topic[i].call(topic[--i], data)
+	// try avoid using apply for speed
+	switch (arguments.length) {
+		case 1: while (i--) topic[i].call(topic[--i]);break
+		case 2: while (i--) topic[i].call(topic[--i], a);break
+		case 3: while (i--) topic[i].call(topic[--i], a, b);break
+		case 4: while (i--) topic[i].call(topic[--i], a, b, c);break
+		default:
+			cbs = slice(arguments, 1)
+			while (i--) {
+				topic[i].apply(topic[--i], cbs)
+			}
+	}
 }
 
 /**
@@ -34,46 +59,19 @@ proto.emit = function (topic, data) {
  *   emitter.on('event', function(){this === emitter}) // the current context is the default
  *
  * @param {String} topic
- * @param {Function} callback to be called when the topic is emitted
+ * @param {Function} fn to be called when the topic is emitted
  * @param {Object} context to call the the function with
- * @return {callback} whatever function was subscribed
+ * @return {fn}
  */
 
-proto.on = function (topic, callback, context) {
-	var calls = this._callbacks
-	if (callback == null) {
-		callback = this['on'+capitalize(topic)]
-		if (!callback) throw new Error('Could not find a method for '+topic)
-	}
-	// Push to the front of the array; Using concat to avoid mutating the old array
-	calls[topic] = [context || this, callback].concat(calls[topic] || [])
+proto.on = function (topic, fn, context) {
+	var cbs = this._callbacks || (this._callbacks = {})
+	// avoid mutating the old array
+	cbs[topic] = cbs[topic]
+		? [context || this, fn].concat(cbs[topic])
+		: [context || this, fn]
 
-	return callback
-}
-
-/*!
- * Capitalize the first letter of a word
- */
-
-function capitalize (word) {
-	return word[0].toUpperCase() + word.slice(1)
-}
-
-/**
- * Add the subscription but insure its never called more than once
- * @see Emitter#on
- */
-
-proto.once = function (topics, callback, context) {
-	var self = this
-	return this.on(
-		topics, 
-		function on (data) {
-			self.off(topics, on)
-			return callback.call(context, data)
-		}, 
-		context
-	)
+	return fn
 }
 
 /**
@@ -85,29 +83,33 @@ proto.once = function (topics, callback, context) {
  *   emitter.off('topic', fn, window) // as above but only if the context is `window`
  *
  * @param {String} [topic]
- * @param {Function} [callback]
+ * @param {Function} [fn]
  * @param {Any} [context]
  */
 
-proto.off = function (topic, callback, context) {
+proto.off = function (topic, fn, context) {
+	var cbs = this._callbacks
+	if (!cbs) return
+	// no filters?
 	if (topic == null) {
-		this._callbacks = {}
+		// ... clear everything
+		for (var i in cbs) delete cbs[i]
+	// no function?
+	} else if (!fn) {
+		// ... clear the topic
+		delete cbs[topic]
 	} else {
-		var calls = this._callbacks
-		if (callback) {
-			var events = calls[topic]
-			if (!events) return
-			var i = events.length
-			while (i--) {
-				if (events[i--] === callback) {
-					if (context && events[i] !== context) continue
-					events = events.slice()
-					events.splice(i, 2)
-					calls[topic] = events
-				}
+		var events = cbs[topic]
+		if (!events) return
+		var i = events.length
+		while (i--) {
+			if (events[i--] === fn) {
+				// if `context` was passed that needs to match too
+				if (context && events[i] !== context) continue
+				events = events.slice()
+				events.splice(i, 2)
+				cbs[topic] = events
 			}
-		} else {
-			delete calls[topic]
 		}
 	}
 }

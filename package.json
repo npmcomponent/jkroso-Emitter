@@ -1,7 +1,7 @@
 {
   "name": "emitter",
   "description": "Basic event emitter",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "homepage": "https://github.com/jkroso/Emitter",
   "author": "Jakeb Rosoman <jkroso@gmail.com>",
   "repository": {
@@ -15,7 +15,9 @@
     }
   ],
   "main": "src/index.js",
-  "dependencies": {},
+  "dependencies": {
+    "sliced": "0.0.5"
+  },
   "devDependencies": {
     "chai": "*",
     "mocha": "*"
