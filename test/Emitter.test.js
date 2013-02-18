@@ -59,19 +59,19 @@ describe('Mixin', function () {
 })
 
 describe('.on(events, fn, context)', function () {
-	it('Should register the callback', function () {
+	it('should register the callback', function () {
 		a.on('test', noopA)
 		hasSubscription('test', noopA)
 	})
 
-	it('Should be able to subscribe multiple functions per event', function () {
+	it('should be able to subscribe multiple functions per event', function () {
 		a.on('test', noopA, a)
 		a.on('test', noopB, a)
 		hasSubscription('test', noopA, a)
 		hasSubscription('test', noopB, a)
 	})
 
-	it('Should default the context to the current this value', function () {
+	it('should default the context to the current this value', function () {
 		a.on('test', noopA)
 		hasSubscription('test', noopA, a)
 	})

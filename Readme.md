@@ -1,26 +1,30 @@
 # Emitter
 
-A simple event emitter. I implemented my own so I could optimise for performance and implement new features as I require. The main advantage of this implementation is its handling of context. It allows you to specify a context when you create a subscription a la backbone.js but also takes this into account when unsubscribing. So when unsubscribing you have three levels of specificity available to you. topic, topic+callback, and topic+callback+context. This makes it possible to work with methods defined on an objects prototype without wrapping them since you now have a way of differentiating between subscriptions belonging to different instances.
+A simple event emitter.  
+Its only feature is that it allows you to differentiate between different subscriptions by the context they are set to call in. This makes it possible to subscribe the same function several times as you often want to when working with classes.
 
 Example:
 ```js
-function O (name) {this.name = name}
-O.prototype.onResize = function(){
+// a Javascript "class"
+function O (name) {
+	this.name = name
+}
+O.prototype.onGreet = function(){
   console.log('Hi im an O by the name '+this.name)
 }
 
 var a = new O('olivia')
 var b = new O('obby')
 
-viewport.on('resize', a.onResize, a)
-viewport.on('resize', b.onResize, b)
-viewport.emit('resize') 
+emitter.on('greet', a.onGreet, a)
+emitter.on('greet', b.onGreet, b)
+emitter.emit('greet') 
 // => Hi im an O by the name olivia
 // => Hi im an O by the name obby
 
-viewport.off('resize', a.onResize, a)
+emitter.off('greet', a.onGreet, a)
 
-viewport.emit('resize') 
+emitter.emit('greet') 
 // => Hi im an O by the name obby
 ```
 
@@ -36,38 +40,29 @@ with the latest npm
 
 ## API
   - [Emitter()](#emitter)
-  - [Emitter.new()](#emitternew)
-  - [Emitter.mixin()](#emittermixinobjobject)
-  - [Emitter.emit()](#emitteremittopicstringdataany)
-  - [Emitter.on()](#emitterontopicstringcallbackfunctioncontextobject)
-  - [Emitter.once()](#emitteronce)
-  - [Emitter.off()](#emitterofftopicstringcallbackfunctioncontextany)
+  - [Emitter.emit()](#emitteremittopicstringany)
+  - [Emitter.on()](#emitterontopicstringfnfunctioncontextobject)
+  - [Emitter.off()](#emitterofftopicstringfnfunctioncontextany)
 
 ## Emitter()
 
-  Generate an instance of Emitter
+  Generate a new Emitter or mixin methods to `obj`
   
 ```js
 var emitter = new Emitter
+var emitter = Emitter({})
 ```
 
-## Emitter.new()
+## Emitter.emit(topic:String, [...]:Any)
 
-  An alternative constructor syntax
-
-## Emitter.mixin(obj:Object)
-
-  Add emitter behavior to any object
-
-## Emitter.emit(topic:String, data:Any)
-
-  Generate an event
+  Generate an event. All arguments after `topic` will be passed to
+  the handlers
   
 ```js
 emitter.emit('event', new Date)
 ```
 
-## Emitter.on(topic:String, callback:Function, context:Object)
+## Emitter.on(topic:String, fn:Function, context:Object)
 
   Add a subscription under a topic name
   
@@ -78,11 +73,7 @@ emitter.on('event', function(){this === emitter}, emitter)
 emitter.on('event', function(){this === emitter}) // the current context is the default
 ```
 
-## Emitter.once()
-
-  Add the subscription but insure it never called more than once
-
-## Emitter.off([topic]:String, [callback]:Function, [context]:Any)
+## Emitter.off([topic]:String, [fn]:Function, [context]:Any)
 
   Remove subscriptions
   
@@ -93,15 +84,6 @@ emitter.off('topic', fn) // as above but only if the handler === fn
 emitter.off('topic', fn, window) // as above but only if the context is `window`
 ```
 
-## Contributing
-Throw down!
-
-## Release History
-
-v0.5.0 29/12/2012
-- no longer using a chainable api
-- .on() no longer takes multiple topics
-- can default methods
 
 ## License
 Copyright (c) 2012 Jakeb Rosoman
