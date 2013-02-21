@@ -31,7 +31,7 @@ var proto = Emitter.prototype
  * @param {Any} [...]
  */
 
-proto.emit = function (topic, a, b, c) {
+Emitter.prototype.emit = function (topic, a, b, c) {
 	var cbs = this._callbacks
 	if (!(cbs && (topic = cbs[topic]))) return
 	
@@ -64,7 +64,7 @@ proto.emit = function (topic, a, b, c) {
  * @return {fn}
  */
 
-proto.on = function (topic, fn, context) {
+Emitter.prototype.on = function (topic, fn, context) {
 	var cbs = this._callbacks || (this._callbacks = {})
 	// avoid mutating the old array
 	cbs[topic] = cbs[topic]
@@ -87,7 +87,7 @@ proto.on = function (topic, fn, context) {
  * @param {Any} [context]
  */
 
-proto.off = function (topic, fn, context) {
+Emitter.prototype.off = function (topic, fn, context) {
 	var cbs = this._callbacks
 	if (!cbs) return
 	// no filters?
@@ -112,4 +112,13 @@ proto.off = function (topic, fn, context) {
 			}
 		}
 	}
+}
+
+Emitter.prototype.once = function (topic, fn, context) {
+	if (!fn) return
+	var self = this
+	this.on(topic, function once() {
+		fn.apply(this, arguments)
+		self.off(topic, once)
+	}, context)
 }

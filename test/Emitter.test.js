@@ -53,7 +53,8 @@ describe('Mixin', function () {
 		Emitter({}).should.have.keys([
 			'emit',
 			'on',
-			'off'
+			'off',
+			'once'
 		])
 	})
 })
@@ -172,5 +173,17 @@ describe('.off(topic, fn, context)', function () {
 		a.off('test', noopA, sentinel)
 		notSubscription('test', noopA, sentinel)
 		hasSubscription('test', noopA, noopB)
+	})
+})
+
+describe('.once', function () {
+	it('should remove the subscription after once call', function () {
+		var c = 0
+		a.once('test', function () {
+			c++
+		})
+		a.emit('test')
+		a.emit('test')
+		c.should.equal(1)
 	})
 })
