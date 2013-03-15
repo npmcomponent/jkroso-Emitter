@@ -1,4 +1,4 @@
-var Emitter = require('../src')
+var Emitter = require('..')
   , chai = require('chai')
   , should = chai.should()
   , sentinel = {}

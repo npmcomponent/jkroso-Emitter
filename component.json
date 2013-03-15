@@ -2,10 +2,18 @@
   "name": "emitter",
   "repo": "jkroso/Emitter",
   "description": "A simple event emitter",
-  "version": "0.5.0",
-  "keywords": ["event", "emitter", "signal", "message"],
-  "dependencies": {},
-  "main": "src/index.js",
-  "scripts": ["src/index.js"],
+  "version": "0.6.0",
+  "keywords": [
+    "event",
+    "emitter",
+    "signal",
+    "message"
+  ],
+  "dependencies": {
+    "aheckmann/sliced": "*"
+  },
+  "scripts": [
+    "index.js"
+  ],
   "license": "MIT"
 }

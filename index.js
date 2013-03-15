@@ -90,26 +90,26 @@ Emitter.prototype.on = function (topic, fn, context) {
 Emitter.prototype.off = function (topic, fn, context) {
 	var cbs = this._callbacks
 	if (!cbs) return
-	// no filters?
+
+	// no filters
 	if (topic == null) {
-		// ... clear everything
 		for (var i in cbs) delete cbs[i]
-	// no function?
-	} else if (!fn) {
-		// ... clear the topic
+	} 
+	// just a topic
+	else if (!fn) {
 		delete cbs[topic]
-	} else {
+	} 
+	else {
 		var events = cbs[topic]
 		if (!events) return
 		var i = events.length
 		while (i--) {
-			if (events[i--] === fn) {
-				// if `context` was passed that needs to match too
-				if (context && events[i] !== context) continue
-				events = events.slice()
-				events.splice(i, 2)
-				cbs[topic] = events
-			}
+			if (events[i--] !== fn) continue
+			// if `context`, then it needs to match too
+			if (context && events[i] !== context) continue
+			events = events.slice()
+			events.splice(i, 2)
+			cbs[topic] = events
 		}
 	}
 }

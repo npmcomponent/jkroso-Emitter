@@ -14,7 +14,6 @@
       "url": "https://github.com/jkroso/Emitter/master/LICENSE-MIT"
     }
   ],
-  "main": "src/index.js",
   "dependencies": {
     "sliced": "0.0.5"
   },
