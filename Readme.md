@@ -10,7 +10,7 @@ function O (name) {
 	this.name = name
 }
 O.prototype.onGreet = function(){
-  console.log('Hi im an O by the name '+this.name)
+  console.log('Hi, im ' + this.name)
 }
 
 var a = new O('olivia')
@@ -19,13 +19,13 @@ var b = new O('obby')
 emitter.on('greet', a.onGreet, a)
 emitter.on('greet', b.onGreet, b)
 emitter.emit('greet') 
-// => Hi im an O by the name olivia
-// => Hi im an O by the name obby
+// => Hi, im olivia
+// => Hi, im obby
 
 emitter.off('greet', a.onGreet, a)
 
 emitter.emit('greet') 
-// => Hi im an O by the name obby
+// => Hi, im obby
 ```
 
 ## Getting Started
@@ -84,27 +84,5 @@ emitter.off('topic', fn) // as above but only if the handler === fn
 emitter.off('topic', fn, window) // as above but only if the context is `window`
 ```
 
+## [License](License)
 
-## License
-Copyright (c) 2012 Jakeb Rosoman
-
-Permission is hereby granted, free of charge, to any person
-obtaining a copy of this software and associated documentation
-files (the "Software"), to deal in the Software without
-restriction, including without limitation the rights to use,
-copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the
-Software is furnished to do so, subject to the following
-conditions:
-
-The above copyright notice and this permission notice shall be
-included in all copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
-EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
-OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
-NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
-WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
-FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
-OTHER DEALINGS IN THE SOFTWARE.
