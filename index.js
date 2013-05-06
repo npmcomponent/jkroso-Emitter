@@ -1,5 +1,5 @@
 
-var slice = require('sliced')
+var call = Function.prototype.call
 
 module.exports = Emitter
 
@@ -31,22 +31,21 @@ var proto = Emitter.prototype
  * @param {Any} [...]
  */
 
-Emitter.prototype.emit = function (topic, a, b, c) {
+Emitter.prototype.emit = function (topic) {
 	var cbs = this._callbacks
-	if (!(cbs && (topic = cbs[topic]))) return
-	
-	var i = topic.length
+	if (!(cbs && (cbs = cbs[topic]))) return
+	var i = cbs.length
 	// try avoid using apply for speed
 	switch (arguments.length) {
-		case 1: while (i--) topic[i].call(topic[--i]);break
-		case 2: while (i--) topic[i].call(topic[--i], a);break
-		case 3: while (i--) topic[i].call(topic[--i], a, b);break
-		case 4: while (i--) topic[i].call(topic[--i], a, b, c);break
-		default:
-			cbs = slice(arguments, 1)
-			while (i--) {
-				topic[i].apply(topic[--i], cbs)
-			}
+		case 1: while (i) cbs[--i].call(cbs[--i]);break
+		case 2: while (i) cbs[--i].call(cbs[--i], arguments[1]);break
+		case 3: while (i) cbs[--i].call(cbs[--i], arguments[1], arguments[2]);break
+		case 4: while (i) cbs[--i].call(cbs[--i], arguments[1], arguments[2], arguments[3]);break
+		default:while (i) {
+			var ƒ = cbs[--i]
+			topic = cbs[--i]
+			call.apply(ƒ, arguments)
+		}
 	}
 }
 

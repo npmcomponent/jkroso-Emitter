@@ -1,7 +1,7 @@
 {
   "name": "emitter",
   "description": "Basic event emitter",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "homepage": "https://github.com/jkroso/Emitter",
   "author": "Jakeb Rosoman <jkroso@gmail.com>",
   "repository": {
@@ -14,18 +14,17 @@
       "url": "https://github.com/jkroso/Emitter/master/LICENSE-MIT"
     }
   ],
-  "dependencies": {
-    "sliced": "0.0.5"
-  },
   "devDependencies": {
     "chai": "*",
-    "mocha": "*"
+    "mocha": "*",
+    "b": "~2.0.0"
   },
   "scripts": {
     "test": "mocha -R spec test/Emitter.test.js"
   },
   "keywords": [
-    "event"
+    "event",
+    "emitter"
   ],
   "license": "MIT"
 }
