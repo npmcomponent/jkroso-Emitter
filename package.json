@@ -1,7 +1,7 @@
 {
   "name": "emitter",
   "description": "Basic event emitter",
-  "version": "0.6.1",
+  "version": "0.6.2",
   "homepage": "https://github.com/jkroso/Emitter",
   "author": "Jakeb Rosoman <jkroso@gmail.com>",
   "repository": {
