@@ -31,8 +31,8 @@ var proto = Emitter.prototype
  * @param {Any} [...]
  */
 
-Emitter.prototype.emit = function (topic) {
-	var cbs = this._callbacks
+Emitter.prototype.emit = function(topic){
+	var cbs = this._events
 	if (!(cbs && (cbs = cbs[topic]))) return
 	var i = cbs.length
 	// try avoid using apply for speed
@@ -63,8 +63,8 @@ Emitter.prototype.emit = function (topic) {
  * @return {fn}
  */
 
-Emitter.prototype.on = function (topic, fn, context) {
-	var cbs = this._callbacks || (this._callbacks = {})
+Emitter.prototype.on = function(topic, fn, context){
+	var cbs = this._events || (this._events = {})
 	// avoid mutating the old array
 	cbs[topic] = cbs[topic]
 		? [context || this, fn].concat(cbs[topic])
@@ -86,8 +86,8 @@ Emitter.prototype.on = function (topic, fn, context) {
  * @param {Any} [context]
  */
 
-Emitter.prototype.off = function (topic, fn, context) {
-	var cbs = this._callbacks
+Emitter.prototype.off = function(topic, fn, context){
+	var cbs = this._events
 	if (!cbs) return
 
 	// no filters
@@ -113,11 +113,33 @@ Emitter.prototype.off = function (topic, fn, context) {
 	}
 }
 
-Emitter.prototype.once = function (topic, fn, context) {
+Emitter.prototype.once = function(topic, fn, context){
 	if (!fn) return
 	var self = this
 	this.on(topic, function once() {
 		fn.apply(this, arguments)
 		self.off(topic, once)
 	}, context)
+}
+
+/**
+ * test if a subscription is present
+ *
+ * @param {String} topic
+ * @param {Function} [ƒ=*]
+ * @param {Any} [ctx=*]
+ * @return {Boolean}
+ */
+
+Emitter.prototype.hasSubscription = function(topic, ƒ, ctx){
+	var cbs = this._events
+	if (!cbs) return false
+	if (!(cbs = cbs[topic])) return false
+	if (!ƒ) return true
+	for (var i = 0, len = cbs.length; i < len; i+=2) {
+		if (cbs[i + 1] === ƒ) {
+			if (ctx == null || ctx === cbs[i]) return true
+		}
+	}
+	return false
 }
