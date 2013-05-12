@@ -149,7 +149,7 @@ describe('light.js', function () {
 		
 		// its useful occasionally
 		it('should maintain identity of the events store', function () {
-			var events = emitter._events
+			var events = emitter._events = {}
 			emitter.on('rad', function () {})
 			emitter.off()
 			emitter._events.should.equal(events)

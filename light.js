@@ -22,7 +22,6 @@ function Emitter (obj) {
 		}
 		return obj
 	}
-	this._events = {}
 }
 
 var proto = Emitter.prototype
