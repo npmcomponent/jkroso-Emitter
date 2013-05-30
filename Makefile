@@ -1,5 +1,5 @@
-GRAPH=node_modules/.bin/sourcegraph.js -p nodeish,mocha
-COMPILE=node_modules/.bin/bigfile.js -p nodeish
+GRAPH=node_modules/.bin/sourcegraph -p nodeish,mocha
+COMPILE=node_modules/.bin/bigfile -p nodeish
 REPORTER=dot
 
 all: test/built.js

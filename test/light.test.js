@@ -1,6 +1,6 @@
 
 var Emitter = require('../light')
-	, should = require('chai').should()
+	, chai = require('./chai')
 
 function noopA () {}
 function noopB () {}
@@ -97,8 +97,8 @@ describe('light.js', function () {
 			hasSubscription('test', noopB)
 		})
 
-		it('should return the function which was subscribed', function () {
-			emitter.on('test', noopA).should.equal(noopA)
+		it('should return `this`', function () {
+			emitter.on('test', noopA).should.equal(emitter)
 		})
 	})
 
