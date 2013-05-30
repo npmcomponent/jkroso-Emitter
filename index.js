@@ -29,11 +29,12 @@ var proto = Emitter.prototype
  *   
  * @param {String} topic the events topic
  * @param {Any} [...]
+ * @return {this}
  */
 
 Emitter.prototype.emit = function(topic){
 	var cbs = this._events
-	if (!(cbs && (cbs = cbs[topic]))) return
+	if (!(cbs && (cbs = cbs[topic]))) return this
 	var i = cbs.length
 	// try avoid using apply for speed
 	switch (arguments.length) {
@@ -47,6 +48,7 @@ Emitter.prototype.emit = function(topic){
 			call.apply(ƒ, arguments)
 		}
 	}
+	return this
 }
 
 /**
@@ -60,7 +62,7 @@ Emitter.prototype.emit = function(topic){
  * @param {String} topic
  * @param {Function} fn to be called when the topic is emitted
  * @param {Object} context to call the the function with
- * @return {fn}
+ * @return {this}
  */
 
 Emitter.prototype.on = function(topic, fn, context){
@@ -70,7 +72,7 @@ Emitter.prototype.on = function(topic, fn, context){
 		? [context || this, fn].concat(cbs[topic])
 		: [context || this, fn]
 
-	return fn
+	return this
 }
 
 /**
@@ -84,11 +86,12 @@ Emitter.prototype.on = function(topic, fn, context){
  * @param {String} [topic]
  * @param {Function} [fn]
  * @param {Any} [context]
+ * @return {this}
  */
 
 Emitter.prototype.off = function(topic, fn, context){
 	var cbs = this._events
-	if (!cbs) return
+	if (!cbs) return this
 
 	// no filters
 	if (topic == null) {
@@ -100,7 +103,7 @@ Emitter.prototype.off = function(topic, fn, context){
 	} 
 	else {
 		var events = cbs[topic]
-		if (!events) return
+		if (!events) return this
 		var i = events.length
 		while (i--) {
 			if (events[i--] !== fn) continue
@@ -111,12 +114,13 @@ Emitter.prototype.off = function(topic, fn, context){
 			cbs[topic] = events
 		}
 	}
+	return this
 }
 
 Emitter.prototype.once = function(topic, fn, context){
-	if (!fn) return
+	if (!fn) throw new Error('requires a function')
 	var self = this
-	this.on(topic, function once() {
+	return this.on(topic, function once() {
 		fn.apply(this, arguments)
 		self.off(topic, once)
 	}, context)

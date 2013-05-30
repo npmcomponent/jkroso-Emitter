@@ -1,7 +1,7 @@
 {
   "name": "emitter",
   "description": "a basic event emitter",
-  "version": "0.6.3",
+  "version": "0.7.0",
   "homepage": "https://github.com/jkroso/Emitter",
   "author": "Jakeb Rosoman <jkroso@gmail.com>",
   "repository": {
@@ -18,9 +18,9 @@
   "devDependencies": {
     "b": "~2.0.0",
     "chai": "~1.6.0",
-    "mocha": "~1.9.0",
-    "sourcegraph": "~0.7.0",
-    "bigfile": "~0.4.0"
+    "mocha": "~1.10.0",
+    "sourcegraph": "~0.7.1",
+    "bigfile": "~0.5.2"
   },
   "keywords": [
     "event",

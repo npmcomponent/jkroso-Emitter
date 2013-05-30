@@ -34,11 +34,12 @@ var proto = Emitter.prototype
  *   
  * @param {String} topic the events topic
  * @param {Any} [...]
+ * @return {this}
  */
 
 Emitter.prototype.emit = function (topic) {
 	var sub = this._events
-	if (!(sub && (sub = sub[topic]))) return
+	if (!(sub && (sub = sub[topic]))) return this
 	// single subsription case
 	if (typeof sub == 'function') {
 		// avoid using .apply() for speed
@@ -65,6 +66,7 @@ Emitter.prototype.emit = function (topic) {
 				while (ƒ = sub[i++]) call.apply(ƒ, arguments)
 		}
 	}
+	return this
 }
 
 /**
@@ -74,7 +76,7 @@ Emitter.prototype.emit = function (topic) {
  *
  * @param {String} topic
  * @param {Function} fn
- * @return {fn}
+ * @return {this}
  */
 
 Emitter.prototype.on = function (topic, fn) {
@@ -86,7 +88,7 @@ Emitter.prototype.on = function (topic, fn) {
 	} else {
 		events[topic] = subs.concat(fn)
 	}
-	return fn
+	return this
 }
 
 /**
@@ -98,11 +100,12 @@ Emitter.prototype.on = function (topic, fn) {
  *
  * @param {String} [topic]
  * @param {Function} [fn]
+ * @return {this}
  */
 
 Emitter.prototype.off = function (topic, fn) {
 	var events = this._events
-	if (!events) return
+	if (!events) return this
 
 	// no filters
 	if (topic == null) {
@@ -114,7 +117,7 @@ Emitter.prototype.off = function (topic, fn) {
 	}
 	else {
 		var subs = events[topic]
-		if (!subs) return
+		if (!subs) return this
 		if (typeof subs == 'function') {
 			if (subs === fn) delete events[topic]
 		} else {
@@ -126,12 +129,13 @@ Emitter.prototype.off = function (topic, fn) {
 			else if (!subs.length) delete events[topic]
 		}
 	}
+	return this
 }
 
 Emitter.prototype.once = function (topic, fn) {
-	if (!fn) return
+	if (!fn) throw new Error('requires a function')
 	var self = this
-	this.on(topic, function once() {
+	return this.on(topic, function once() {
 		fn.apply(this, arguments)
 		self.off(topic, once)
 	})
