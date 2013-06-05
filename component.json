@@ -2,7 +2,7 @@
   "name": "emitter",
   "repo": "jkroso/Emitter",
   "description": "A simple event emitter",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "keywords": [
     "event",
     "emitter",
@@ -12,5 +12,10 @@
   "scripts": [
     "index.js"
   ],
-  "license": "MIT"
+  "license": "MIT",
+  "development": {
+    "chaijs/chai": "1.6.1",
+    "visionmedia/mocha": "1.9.0",
+    "jkroso/serve": "1.2.3"
+  }
 }

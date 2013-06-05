@@ -8,20 +8,7 @@
     "type": "git",
     "url": "git://github.com/jkroso/Emitter.git"
   },
-  "licenses": [
-    {
-      "type": "MIT",
-      "url": "https://github.com/jkroso/Emitter/master/LICENSE-MIT"
-    }
-  ],
   "dependencies": {},
-  "devDependencies": {
-    "b": "~2.0.0",
-    "chai": "~1.6.0",
-    "mocha": "~1.10.0",
-    "sourcegraph": "~0.7.1",
-    "bigfile": "~0.5.2"
-  },
   "keywords": [
     "event",
     "emitter"
