@@ -54,16 +54,17 @@ Emitter.prototype.emit = function (topic) {
 				call.apply(sub, arguments)
 		}
 	} else {
-		var i = 0
 		var ƒ
+		var i = 0
+		var l = sub.length
 		switch (arguments.length) {
-			case 1: while (ƒ = sub[i++]) ƒ.call(this);break
-			case 2: while (ƒ = sub[i++]) ƒ.call(this, arguments[1]);break
-			case 3: while (ƒ = sub[i++]) ƒ.call(this, arguments[1], arguments[2]);break
-			case 4: while (ƒ = sub[i++]) ƒ.call(this, arguments[1], arguments[2], arguments[3]);break
+			case 1: while (i < l) sub[i++].call(this);break
+			case 2: while (i < l) sub[i++].call(this, arguments[1]);break
+			case 3: while (i < l) sub[i++].call(this, arguments[1], arguments[2]);break
+			case 4: while (i < l) sub[i++].call(this, arguments[1], arguments[2], arguments[3]);break
 			default:
 				topic = this
-				while (ƒ = sub[i++]) call.apply(ƒ, arguments)
+				while (i < l) call.apply(sub[i++], arguments)
 		}
 	}
 	return this
@@ -86,7 +87,7 @@ Emitter.prototype.on = function (topic, fn) {
 	else if (typeof subs == 'function') {
 		events[topic] = [events[topic], fn]
 	} else {
-		events[topic] = subs.concat(fn)
+		events[topic].push(fn)
 	}
 	return this
 }
@@ -136,7 +137,7 @@ Emitter.prototype.once = function (topic, fn) {
 	if (!fn) throw new Error('requires a function')
 	var self = this
 	return this.on(topic, function once() {
-		fn.apply(this, arguments)
 		self.off(topic, once)
+		fn.apply(this, arguments)
 	})
 }
