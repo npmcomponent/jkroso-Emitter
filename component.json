@@ -14,8 +14,9 @@
   ],
   "license": "MIT",
   "development": {
-    "chaijs/chai": "1.6.1",
-    "visionmedia/mocha": "1.9.0",
-    "jkroso/serve": "1.2.3"
+    "chaijs/chai": "1.7.2",
+    "visionmedia/mocha": "1.11.0",
+    "jkroso/serve": "1.4.2",
+    "vesln/b": "8c21b9c961254115b64a1d766793dc7bbcf587e1"
   }
 }

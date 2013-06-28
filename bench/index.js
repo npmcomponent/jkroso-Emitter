@@ -1,6 +1,8 @@
 
+var path = require('path')
+var resolve = path.resolve
+var basename = path.basename
 var b = require('b')
-  , resolve = require('path').resolve
 
 var file = __dirname + '/run.js'
 var imps = ['index.js', 'light.js', 'bench/node.js']
@@ -10,8 +12,9 @@ function run(subs){
 
 	imps.forEach(function(name){
 		var path = resolve(__dirname, '..', name)
+		var title = basename(name, '.js')
 		for (var i = 0; i < 5; i++) {
-			batch.addFile(name+' ('+i+' args)', file, path, i, subs)
+			batch.addFile(title + ' ('+i+' args)', file, path, i, subs)
 		}
 	})
 
