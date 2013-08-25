@@ -1,7 +1,7 @@
 REPORTER=dot
 
 serve: node_modules
-	@node_modules/serve/bin/serve
+	@node_modules/serve/bin/serve -Sloj
 
 test: node_modules
 	@node_modules/mocha/bin/_mocha test/*.test.js \
@@ -17,10 +17,7 @@ node_modules: component.json
 		--executables \
 		--no-retrace
 
-clean:
-	rm -r node_modules
-
 bench: node_modules
 	@node bench/index.js
 
-.PHONY: clean serve test bench
+.PHONY: serve test bench
