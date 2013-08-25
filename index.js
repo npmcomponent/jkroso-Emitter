@@ -67,7 +67,7 @@ Emitter.prototype.emit = function(topic){
  */
 
 Emitter.prototype.on = function(topic, fn, context){
-	var cbs = this.hasOwnProperty('_events')
+	var cbs = own.call(this, '_events')
 		? this._events
 		: this._events = this._events
 			? clone(this._events)
@@ -104,7 +104,7 @@ function clone(o){
 Emitter.prototype.off = function(topic, fn, context){
 	var cbs = this._events
 	if (!cbs) return this
-	if (!this.hasOwnProperty('_events')) {
+	if (!own.call(this, '_events')) {
 		cbs = this._events = clone(cbs)
 	}
 
