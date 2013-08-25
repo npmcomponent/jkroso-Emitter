@@ -16,8 +16,10 @@
   "license": "MIT",
   "development": {
     "visionmedia/mocha": "1.12.0",
+    "component/inherit": "0.0.2",
     "jkroso/serve": "1.5.0",
     "chaijs/chai": "1.7.2",
-    "vesln/b": "fc64f24"
+    "vesln/b": "fc64f24",
+    "chaijs/chai-spies": "0.5.1"
   }
 }

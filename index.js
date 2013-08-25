@@ -1,5 +1,6 @@
 
-var call = Function.prototype.call
+var own = {}.hasOwnProperty
+var call = Function.call
 
 module.exports = Emitter
 
@@ -66,13 +67,24 @@ Emitter.prototype.emit = function(topic){
  */
 
 Emitter.prototype.on = function(topic, fn, context){
-	var cbs = this._events || (this._events = {})
+	var cbs = this.hasOwnProperty('_events')
+		? this._events
+		: this._events = this._events
+			? clone(this._events)
+			: {}
+
 	// avoid mutating the old array
 	cbs[topic] = cbs[topic]
 		? [context || this, fn].concat(cbs[topic])
 		: [context || this, fn]
 
 	return this
+}
+
+function clone(o){
+	var c = {}
+	for (var k in o) c[k] = o[k]
+	return c
 }
 
 /**
@@ -92,6 +104,9 @@ Emitter.prototype.on = function(topic, fn, context){
 Emitter.prototype.off = function(topic, fn, context){
 	var cbs = this._events
 	if (!cbs) return this
+	if (!this.hasOwnProperty('_events')) {
+		cbs = this._events = clone(cbs)
+	}
 
 	// no filters
 	if (topic == null) {

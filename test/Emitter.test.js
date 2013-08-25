@@ -1,12 +1,13 @@
 
+var inherit = require('inherit')
+var chai = require('./chai')
 var Emitter = require('..')
-  , chai = require('./chai')
-  , sentinel = {}
+var sentinel = {}
 
-function noopA () {}
-function noopB () {}
+function noopA(){}
+function noopB(){}
 
-function hasSubscription (topic, fn, context) {
+function hasSubscription(topic, fn, context){
 	var calls = emitter._events[topic]
 	calls.should.be.an('array')
 	for (var i = 0, len = calls.length; i < len; i+=2) {
@@ -19,7 +20,7 @@ function hasSubscription (topic, fn, context) {
 	throw new Error('Subscription not found in '+topic)
 }
 
-function notSubscription (topic, fn, context) {
+function notSubscription(topic, fn, context){
 	var calls = emitter._events[topic]
 	if (!calls) return
 	calls.should.be.an('array')
@@ -32,9 +33,11 @@ function notSubscription (topic, fn, context) {
 	}
 }
 
-var emitter 
+var emitter
+var spy
 beforeEach(function () {
 	emitter = new Emitter
+	spy = chai.spy()
 })
 
 describe('Instantiate', function () {
@@ -247,5 +250,27 @@ describe('.hasSubscription()', function () {
 			emitter.hasSubscription('a', noopA, sentinel).should.be.true
 			emitter.hasSubscription('b', noopA, sentinel).should.be.true
 		})
+	})
+})
+
+describe('with inheritance', function(){
+	var Sub
+	beforeEach(function(){
+		Sub = function Sub(){}
+		inherit(Sub, Emitter)
+		Sub.prototype.on('a', spy)
+	})
+	it('should be able to define subscription on prototypes', function(){
+		new Sub().emit('a')
+		spy.should.have.been.called()
+	})
+
+	it('should be able to add subscriptions to instances', function(){
+		var emitter = new Sub
+		emitter.on('b', spy)
+		Sub.prototype.emit('b')
+		spy.should.not.have.been.called()
+		emitter.emit('b')
+		spy.should.have.been.called()
 	})
 })
