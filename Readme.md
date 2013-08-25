@@ -1,71 +1,51 @@
 # Emitter
 
-A simple event emitter.  
-Its only feature is that it allows you to differentiate between different subscriptions by the context they are set to call in. This makes it possible to subscribe the same function several times as you often want to when working with classes.
+A simple event emitter.
 
-Example:
-```js
-// a Javascript "class"
-function O (name) {
-	this.name = name
-}
-O.prototype.onGreet = function(){
-  console.log('Hi, im ' + this.name)
-}
+## Features
 
-var a = new O('olivia')
-var b = new O('obby')
+- inherited subscriptions:  
+This allows you to define subscriptions on the class rather than on each instance of a class which is both more efficient in terms of memery and sometimes cleaner too.
 
-emitter.on('greet', a.onGreet, a)
-emitter.on('greet', b.onGreet, b)
-emitter.emit('greet') 
-// => Hi, im olivia
-// => Hi, im obby
+- each subscription can set its own context:  
+This just means you don't have to `.bind()` functions as often which saves memory and often looks a little nicer. This feature is not present in the [light](light.js) implementation.
 
-emitter.off('greet', a.onGreet, a)
+## Installation
 
-emitter.emit('greet') 
-// => Hi, im obby
+_With [component](//github.com/component/component), [packin](//github.com/jkroso/packin) or [npm](//github.com/isaacs/npm)_  
+
+    $ {package mananger} install jkroso/emitter
+
+then in your app:
+
+```javascript
+var emitter = require('emitter')
 ```
 
-## Getting Started
-
-With component
-
-	$ component install jkroso/emitter
-
-with the latest npm
-
-	$ npm install jkroso/emitter
-
 ## API
-  - [Emitter()](#emitter)
-  - [Emitter.emit()](#emitteremittopicstringany)
-  - [Emitter.on()](#emitterontopicstringfnfunctioncontextobject)
-  - [Emitter.off()](#emitterofftopicstringfnfunctioncontextany)
 
-## Emitter()
+### Emitter()
 
   Generate a new Emitter or mixin methods to `obj`
-  
+
 ```js
 var emitter = new Emitter
 var emitter = Emitter({})
 ```
 
-## Emitter.emit(topic:String, [...]:Any)
+### Emitter.emit(topic:String, [...]:Any)
 
   Generate an event. All arguments after `topic` will be passed to
   the handlers
-  
+
 ```js
 emitter.emit('event', new Date)
 ```
 
-## Emitter.on(topic:String, fn:Function, context:Object)
+### Emitter.on(topic:String, fn:Function, context:Object)
 
   Add a subscription under a topic name
-  
+
 ```js
 emitter.on('event', function(data){})
 emitter.on('event') // implies emitter.on('event', emitter.onEvent)
@@ -73,16 +53,20 @@ emitter.on('event', function(){this === emitter}, emitter)
 emitter.on('event', function(){this === emitter}) // the current context is the default
 ```
 
-## Emitter.off([topic]:String, [fn]:Function, [context]:Any)
+### Emitter.off([topic]:String, [fn]:Function, [context]:Any)
 
   Remove subscriptions
-  
+
 ```js
 emitter.off() // clears all topics
 emitter.off('topic') // clears all handlers from the topic 'topic'
 emitter.off('topic', fn) // as above but only if the handler === fn
 emitter.off('topic', fn, window) // as above but only if the context is `window`
 ```
+
+### Emitter.hasSubscription(topic:String, [ƒ]:Function, [ctx]:Any)
+
+  test if a subscription is present
 
 ## [License](License)
 
