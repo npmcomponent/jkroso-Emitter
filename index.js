@@ -132,26 +132,37 @@ Emitter.prototype.off = function(topic, fn, context){
 	return this
 }
 
-Emitter.prototype.once = function(topic, fn, context){
+/**
+ * same as `.on()` but removes the subscription after
+ * the first time its triggered
+ * 
+ * @param {String} topic
+ * @param {Function} fn
+ * @param {Any} [ctx]
+ * @return {this}
+ */
+
+Emitter.prototype.once = function(topic, fn, ctx){
 	if (!fn) throw new Error('requires a function')
 	var self = this
 	return this.on(topic, function once() {
 		fn.apply(this, arguments)
 		self.off(topic, once)
-	}, context)
+	}, ctx)
 }
 
 /**
- * test if a subscription is present
+ * test if a subscription is present on `emitter`
  *
+ * @param {Emitter} emitter
  * @param {String} topic
- * @param {Function} [ƒ=*]
- * @param {Any} [ctx=*]
+ * @param {Function} [ƒ]
+ * @param {Any} [ctx]
  * @return {Boolean}
  */
 
-Emitter.prototype.hasSubscription = function(topic, ƒ, ctx){
-	var cbs = this._events
+Emitter.hasSubscription = function(emitter, topic, ƒ, ctx){
+	var cbs = emitter._events
 	if (!cbs) return false
 	if (!(cbs = cbs[topic])) return false
 	if (!ƒ) return true

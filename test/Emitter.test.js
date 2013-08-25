@@ -7,29 +7,15 @@ var sentinel = {}
 function noopA(){}
 function noopB(){}
 
-function hasSubscription(topic, fn, context){
-	var calls = emitter._events[topic]
-	calls.should.be.an('array')
-	for (var i = 0, len = calls.length; i < len; i+=2) {
-		calls[i+1].should.be.a('function')
-		if (calls[i+1] === fn) {
-			if (context == null) return
-			else if (context === calls[i]) return
-		}
+function subscribed(topic, fn, ctx){
+	if (!Emitter.hasSubscription(emitter, topic, fn, ctx)) {
+		throw new Error('Subscription not found in ' + topic)
 	}
-	throw new Error('Subscription not found in '+topic)
 }
 
-function notSubscription(topic, fn, context){
-	var calls = emitter._events[topic]
-	if (!calls) return
-	calls.should.be.an('array')
-	for (var i = 0, len = calls.length; i < len; i+=2) {
-		calls[i+1].should.be.a('function')
-		if (calls[i+1] === fn) {
-			if (context != null && context !== calls[i]) return
-			throw new Error('Subscription should not be found in '+topic)
-		}
+function notSubscribed(topic, fn, ctx){
+	if (Emitter.hasSubscription(emitter, topic, fn, ctx)) {
+		throw new Error('Subscription found in ' + topic)
 	}
 }
 
@@ -57,8 +43,7 @@ describe('Mixin', function () {
 			'emit',
 			'on',
 			'off',
-			'once',
-			'hasSubscription'
+			'once'
 		])
 	})
 })
@@ -66,19 +51,19 @@ describe('Mixin', function () {
 describe('.on(events, fn, context)', function () {
 	it('should register the callback', function () {
 		emitter.on('test', noopA)
-		hasSubscription('test', noopA)
+		subscribed('test', noopA)
 	})
 
 	it('should be able to subscribe multiple functions per event', function () {
 		emitter.on('test', noopA, emitter)
 		emitter.on('test', noopB, emitter)
-		hasSubscription('test', noopA, emitter)
-		hasSubscription('test', noopB, emitter)
+		subscribed('test', noopA, emitter)
+		subscribed('test', noopB, emitter)
 	})
 
 	it('should default the context to the current this value', function () {
 		emitter.on('test', noopA)
-		hasSubscription('test', noopA, emitter)
+		subscribed('test', noopA, emitter)
 	})
 
 	it('should return `this`', function () {
@@ -165,22 +150,22 @@ describe('.off(events, fn)', function () {
 	it('Should remove subscriptions which match both the topic and fn', function () {
 		emitter.on('test', noopA)
 		emitter.off('test', noopA)
-		notSubscription('test', noopA, emitter)
+		notSubscribed('test', noopA, emitter)
 	})
 
 	it('Should not remove other subscriptions', function () {
 		emitter.on('test', noopA)
 		emitter.on('test', noopB)
 		emitter.off('test', noopA)
-		notSubscription('test', noopA, emitter)
-		hasSubscription('test', noopB, emitter)
+		notSubscribed('test', noopA, emitter)
+		subscribed('test', noopB, emitter)
 	})
 
 	it('should remove all matching functions', function () {
 		emitter.on('test', noopA, sentinel)
 		emitter.on('test', noopA, noopB)
 		emitter.off('test', noopA)
-		notSubscription('test', noopA)
+		notSubscribed('test', noopA)
 	})
 
 	it('should return `this`', function () {
@@ -193,8 +178,8 @@ describe('.off(topic, fn, context)', function () {
 		emitter.on('test', noopA, noopB)
 		emitter.on('test', noopA, sentinel)
 		emitter.off('test', noopA, sentinel)
-		notSubscription('test', noopA, sentinel)
-		hasSubscription('test', noopA, noopB)
+		notSubscribed('test', noopA, sentinel)
+		subscribed('test', noopA, noopB)
 	})
 
 	it('should return `this`', function () {
@@ -221,34 +206,34 @@ describe('.once()', function () {
 describe('.hasSubscription()', function () {
 	describe('with just a `topic`', function () {
 		it('should detect any subscription on `topic`', function () {
-			emitter.on('test', function(){})		
-			emitter.hasSubscription('test').should.be.true		
-			emitter.hasSubscription('a').should.be.false
+			emitter.on('test', spy)		
+			Emitter.hasSubscription(emitter, 'test').should.be.true		
+			Emitter.hasSubscription(emitter, 'a').should.be.false
 		})
 	})
 
 	describe('with a `topic` and a `function`', function () {
 		it('should detect a match of `topic` and `function`', function () {
-			emitter.on('test', noopA)		
-			emitter.hasSubscription('test', noopA).should.be.true
-			emitter.hasSubscription('test', function(){}).should.be.false
+			emitter.on('test', spy)		
+			Emitter.hasSubscription(emitter, 'test', spy).should.be.true
+			Emitter.hasSubscription(emitter, 'test', function(){}).should.be.false
 		})
 	})
 
 	describe('with the a `context` argument aswell', function () {
 		it('should also check that matches', function () {
-			emitter.on('test', noopA, sentinel)
-			emitter.hasSubscription('test', noopA, sentinel).should.be.true
-			emitter.hasSubscription('test', noopA, {}).should.be.false
+			emitter.on('test', spy, sentinel)
+			Emitter.hasSubscription(emitter, 'test', spy, sentinel).should.be.true
+			Emitter.hasSubscription(emitter, 'test', spy, {}).should.be.false
 		})
 
 		it('should continue searching after failing only on `ctx`', function () {
-			emitter.on('a', noopA, sentinel)
-			emitter.on('a', noopA, {})
-			emitter.on('b', noopA, {})
-			emitter.on('b', noopA, sentinel)
-			emitter.hasSubscription('a', noopA, sentinel).should.be.true
-			emitter.hasSubscription('b', noopA, sentinel).should.be.true
+			emitter.on('a', spy, sentinel)
+			emitter.on('a', spy, {})
+			emitter.on('b', spy, {})
+			emitter.on('b', spy, sentinel)
+			Emitter.hasSubscription(emitter, 'a', spy, sentinel).should.be.true
+			Emitter.hasSubscription(emitter, 'b', spy, sentinel).should.be.true
 		})
 	})
 })
