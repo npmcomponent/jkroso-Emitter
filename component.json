@@ -2,7 +2,7 @@
   "name": "emitter",
   "repo": "jkroso/Emitter",
   "description": "A simple event emitter",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "keywords": [
     "event",
     "emitter",
@@ -10,13 +10,14 @@
     "message"
   ],
   "scripts": [
-    "index.js"
+    "index.js",
+    "light.js"
   ],
   "license": "MIT",
   "development": {
+    "visionmedia/mocha": "1.12.0",
+    "jkroso/serve": "1.5.0",
     "chaijs/chai": "1.7.2",
-    "visionmedia/mocha": "1.11.0",
-    "jkroso/serve": "1.4.2",
-    "vesln/b": "8c21b9c961254115b64a1d766793dc7bbcf587e1"
+    "vesln/b": "fc64f24"
   }
 }
