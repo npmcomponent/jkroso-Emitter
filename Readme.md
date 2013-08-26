@@ -33,7 +33,7 @@ var emitter = new Emitter
 var emitter = Emitter({})
 ```
 
-### Emitter.emit(topic:String, [...]:Any)
+### Emitter#emit(topic:String, [...]:Any)
 
   Generate an event. All arguments after `topic` will be passed to
   the handlers
@@ -42,7 +42,7 @@ var emitter = Emitter({})
 emitter.emit('event', new Date)
 ```
 
-### Emitter.on(topic:String, fn:Function, context:Object)
+### Emitter#on(topic:String, fn:Function, context:Object)
 
   Add a subscription under a topic name
 
@@ -53,7 +53,7 @@ emitter.on('event', function(){this === emitter}, emitter)
 emitter.on('event', function(){this === emitter}) // the current context is the default
 ```
 
-### Emitter.off([topic]:String, [fn]:Function, [context]:Any)
+### Emitter#off([topic]:String, [fn]:Function, [context]:Any)
 
   Remove subscriptions
 
@@ -64,9 +64,13 @@ emitter.off('topic', fn) // as above but only if the handler === fn
 emitter.off('topic', fn, window) // as above but only if the context is `window`
 ```
 
-### Emitter.hasSubscription(topic:String, [ƒ]:Function, [ctx]:Any)
+### Emitter#once(topic:String, fn:Function, [ctx]:Any)
 
-  test if a subscription is present
+  same as `.on()` but removes the subscription after
+  the first time its triggered
+
+### Emitter.hasSubscription(emitter:Emitter, topic:String, [ƒ]:Function, [ctx]:Any)
+
+  test if a subscription is present on `emitter`
 
 ## [License](License)
-
