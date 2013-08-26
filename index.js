@@ -69,9 +69,7 @@ Emitter.prototype.emit = function(topic){
 Emitter.prototype.on = function(topic, fn, context){
 	var cbs = own.call(this, '_events')
 		? this._events
-		: this._events = this._events
-			? clone(this._events)
-			: {}
+		: this._events = clone(this._events)
 
 	// avoid mutating the old array
 	cbs[topic] = cbs[topic]
@@ -102,21 +100,16 @@ function clone(o){
  */
 
 Emitter.prototype.off = function(topic, fn, context){
-	var cbs = this._events
-	if (!cbs) return this
-	if (!own.call(this, '_events')) {
-		cbs = this._events = clone(cbs)
-	}
+	if (!this._events) return this
+	var cbs = own.call(this, '_events')
+		? this._events
+		: this._events = clone(cbs)
 
-	// no filters
 	if (topic == null) {
 		for (var i in cbs) delete cbs[i]
-	} 
-	// just a topic
-	else if (!fn) {
+	} else if (fn == null) {
 		delete cbs[topic]
-	} 
-	else {
+	} else {
 		var events = cbs[topic]
 		if (!events) return this
 		var i = events.length
