@@ -1,21 +1,16 @@
+
 /**
  * A highly optimised emitter implementation. Optimised to 
  * minimize both memory and CPU consumption. Its good for 
  * implementing simple but hot things like streams. 
  */
 
-var call = Function.prototype.call
+var own = {}.hasOwnProperty
+var call = Function.call
 
 module.exports = Emitter
 
-/**
- * Generate a new Emitter or mixin methods to `obj`
- *
- *   var emitter = new Emitter
- *   var emitter = Emitter({})
- */
-
-function Emitter (obj) {
+function Emitter(obj){
 	if (obj) {
 		for (var prop in proto) {
 			obj[prop] = proto[prop]
@@ -26,18 +21,7 @@ function Emitter (obj) {
 
 var proto = Emitter.prototype
 
-/**
- * Generate an event. All arguments after `topic` will be passed to
- * the handlers
- *
- *   emitter.emit('event', new Date)
- *   
- * @param {String} topic the events topic
- * @param {Any} [...]
- * @return {this}
- */
-
-Emitter.prototype.emit = function (topic) {
+Emitter.prototype.emit = function(topic){
 	var sub = this._events
 	if (!(sub && (sub = sub[topic]))) return this
 	// single subsription case
@@ -70,53 +54,43 @@ Emitter.prototype.emit = function (topic) {
 	return this
 }
 
-/**
- * subscribe `fn` to `topic`
- *
- *   emitter.on('event', function(data){})
- *
- * @param {String} topic
- * @param {Function} fn
- * @return {this}
- */
-
-Emitter.prototype.on = function (topic, fn) {
-	var events = this._events || (this._events = {})
-	var subs = events[topic] 
-	if (!subs) events[topic] = fn
-	else if (typeof subs == 'function') {
+Emitter.prototype.on = function(topic, fn){
+	if (!own.call(this, '_events')) {
+		this._events = clone(this._events)
+	}
+	var events = this._events
+	if (typeof events[topic] == 'function') {
 		events[topic] = [events[topic], fn]
-	} else {
+	} else if (events[topic]) {
 		events[topic].push(fn)
+	} else {
+		events[topic] = fn
 	}
 	return this
 }
 
-/**
- * Remove subscriptions
- *
- *   emitter.off() // clears all topics
- *   emitter.off('topic') // clears all handlers from the topic 'topic'
- *   emitter.off('topic', fn) // as above but only if the handler === fn
- *
- * @param {String} [topic]
- * @param {Function} [fn]
- * @return {this}
- */
+function clone(o){
+	var c = {}
+	for (var k in o) {
+		c[k] = typeof o[k] == 'object'
+			? o[k].slice()
+			: o[k]
+	}
+	return c
+}
 
-Emitter.prototype.off = function (topic, fn) {
+Emitter.prototype.off = function(topic, fn){
+	if (!this._events) return this
+	if (!own.call(this, '_events')) {
+		this._events = clone(this._events)
+	}
 	var events = this._events
-	if (!events) return this
 
-	// no filters
 	if (topic == null) {
 		for (var i in events) delete events[i]
-	} 
-	// just a topic
-	else if (!fn) {
+	} else if (fn == null) {
 		delete events[topic]
-	}
-	else {
+	} else {
 		var subs = events[topic]
 		if (!subs) return this
 		if (typeof subs == 'function') {
@@ -133,11 +107,23 @@ Emitter.prototype.off = function (topic, fn) {
 	return this
 }
 
-Emitter.prototype.once = function (topic, fn) {
-	if (!fn) throw new Error('requires a function')
+Emitter.prototype.once = function(topic, fn){
 	var self = this
 	return this.on(topic, function once() {
 		self.off(topic, once)
 		fn.apply(this, arguments)
 	})
+}
+
+Emitter.hasSubscription = function(emitter, topic, fn){
+	var fns = Emitter.subscriptions(emitter, topic)
+	if (fn == null) return Boolean(fns.length)
+	return fns.indexOf(fn) >= 0
+}
+
+Emitter.subscriptions = function(emitter, topic){
+	var fns = emitter._events
+	if (!fns || !(fns = fns[topic])) return []
+	if (typeof fns == 'function') return [fns]
+	return fns.slice()
 }

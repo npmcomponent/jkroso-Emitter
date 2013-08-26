@@ -1,50 +1,29 @@
 
 var Emitter = require('../light')
-	, chai = require('./chai')
+var inherit = require('inherit')
+var chai = require('./chai')
 
 function noopA () {}
 function noopB () {}
 
-/**
- * helper to assert the existence of a subscription
- */
-
-function hasSubscription (topic, fn) {
-	var calls = emitter._events[topic]
-	if (typeof calls == 'function') {
-		if (calls !== fn) throw new Error('wrong subscription')
-	} else if (calls instanceof Array) {
-		if (calls.indexOf(fn) < 0) error()
-	} else {
-		error()
-	}
-
-	function error(){
-		throw new Error('Subscription not found in '+topic)
-	}
-}
-
-/**
- * helper to assert a subscription doesn't exist
- */
-
-function notSubscription (topic, fn) {
-	var calls = emitter._events[topic]
-	if (typeof calls == 'function') {
-		if (calls === fn) error()
-	} else if (calls instanceof Array) {
-		if (calls.indexOf(fn) >= 0) error()
-	}
-
-	function error(){
-		throw new Error('subcription exists')
-	}
-}
-
 var emitter
 
+function subscribed(topic, fn){
+	if (!Emitter.hasSubscription(emitter, topic, fn)) {
+		throw new Error('Subscription not found in ' + topic)
+	}
+}
+
+function notSubscribed(topic, fn){
+	if (Emitter.hasSubscription(emitter, topic, fn)) {
+		throw new Error('Subscription found in ' + topic)
+	}
+}
+
 describe('light.js', function () {
+	var spy
 	beforeEach(function () {
+		spy = chai.spy()
 		emitter = new Emitter
 	})
 
@@ -87,14 +66,14 @@ describe('light.js', function () {
 	describe('.on(String, Function)', function () {
 		it('should register the callback', function () {
 			emitter.on('test', noopA)
-			hasSubscription('test', noopA)
+			subscribed('test', noopA)
 		})
 
 		it('should be able to subscribe multiple functions per event', function () {
 			emitter.on('test', noopA)
 			emitter.on('test', noopB)
-			hasSubscription('test', noopA)
-			hasSubscription('test', noopB)
+			subscribed('test', noopA)
+			subscribed('test', noopB)
 		})
 
 		it('should return `this`', function () {
@@ -161,8 +140,8 @@ describe('light.js', function () {
 			emitter.on('test', noopA)
 			emitter.on('test', noopB)
 			emitter.off('test')
-			notSubscription('test', noopA)
-			notSubscription('test', noopB)
+			notSubscribed('test', noopA)
+			notSubscribed('test', noopB)
 		})
 	})
 
@@ -170,22 +149,22 @@ describe('light.js', function () {
 		it('Should remove subscriptions which match both the topic and fn', function () {
 			emitter.on('test', noopA)
 			emitter.off('test', noopA)
-			notSubscription('test', noopA)
+			notSubscribed('test', noopA)
 		})
 
 		it('Should not remove other subscriptions', function () {
 			emitter.on('test', noopA)
 			emitter.on('test', noopB)
 			emitter.off('test', noopA)
-			notSubscription('test', noopA)
-			hasSubscription('test', noopB)
+			notSubscribed('test', noopA)
+			subscribed('test', noopB)
 		})
 
 		it('should remove all matching functions', function () {
 			emitter.on('test', noopA)
 			emitter.on('test', noopA)
 			emitter.off('test', noopA)
-			notSubscription('test', noopA)
+			notSubscribed('test', noopA)
 		})
 	})
 
@@ -198,6 +177,46 @@ describe('light.js', function () {
 			emitter.emit('test')
 			emitter.emit('test')
 			c.should.equal(1)
+		})
+	})
+
+	describe('.hasSubscription()', function () {
+		describe('with just a `topic`', function () {
+			it('should detect any subscription on `topic`', function () {
+				emitter.on('test', spy)
+				Emitter.hasSubscription(emitter, 'test').should.be.true
+				Emitter.hasSubscription(emitter, 'a').should.be.false
+			})
+		})
+
+		describe('with a `topic` and a `function`', function () {
+			it('should detect a match of `topic` and `function`', function () {
+				emitter.on('test', spy)
+				Emitter.hasSubscription(emitter, 'test', spy).should.be.true
+				Emitter.hasSubscription(emitter, 'test', function(){}).should.be.false
+			})
+		})
+	})
+
+	describe('with inheritance', function(){
+		var Sub
+		beforeEach(function(){
+			Sub = function Sub(){}
+			inherit(Sub, Emitter)
+			Sub.prototype.on('a', spy)
+		})
+		it('should be able to define subscription on prototypes', function(){
+			new Sub().emit('a')
+			spy.should.have.been.called()
+		})
+
+		it('should be able to add subscriptions to instances', function(){
+			var emitter = new Sub
+			emitter.on('b', spy)
+			Sub.prototype.emit('b')
+			spy.should.not.have.been.called()
+			emitter.emit('b')
+			spy.should.have.been.called()
 		})
 	})
 })
