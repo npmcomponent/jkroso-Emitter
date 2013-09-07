@@ -1,8 +1,8 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
 <head>
+	<meta charset="utf-8">
 	<title>emitter tests</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<link rel="stylesheet" href="../node_modules/mocha/mocha.css">
 </head>
@@ -13,12 +13,10 @@
 
 		mocha.setup('bdd')
 
-		require('./Emitter.test')
+		require('./heavy.test')
 		require('./light.test')
 
-		mocha.run(function () {
-			console.log('Done!')
-		})
+		mocha.run()
 	</script>
 </body>
 </html>

@@ -5,21 +5,15 @@
  * implementing simple but hot things like streams. 
  */
 
+var mixin = require('merge')
 var own = {}.hasOwnProperty
 var call = Function.call
 
 module.exports = Emitter
 
 function Emitter(obj){
-	if (obj) {
-		for (var prop in proto) {
-			obj[prop] = proto[prop]
-		}
-		return obj
-	}
+	if (obj) return mixin(obj, Emitter.prototype)
 }
-
-var proto = Emitter.prototype
 
 Emitter.prototype.emit = function(topic){
 	var sub = this._events

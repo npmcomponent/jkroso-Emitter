@@ -19,7 +19,7 @@ _With [component](//github.com/component/component), [packin](//github.com/jkros
 then in your app:
 
 ```javascript
-var emitter = require('emitter')
+var Emitter = require('emitter/heavy')
 ```
 
 ## API
