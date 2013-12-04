@@ -1,8 +1,8 @@
 
 /**
- * A highly optimised emitter implementation. Optimised to 
- * minimize both memory and CPU consumption. Its good for 
- * implementing simple but hot things like streams. 
+ * A highly optimised emitter implementation. Optimised to
+ * minimize both memory and CPU consumption. Its good for
+ * implementing simple but hot things like streams.
  */
 
 var merge = require('merge')
@@ -32,7 +32,7 @@ Emitter.prototype.emit = function(topic){
 				call.apply(sub, arguments)
 		}
 	} else {
-		var ƒ
+		var fn
 		var i = 0
 		var l = sub.length
 		switch (arguments.length) {
@@ -80,8 +80,8 @@ Emitter.prototype.off = function(topic, fn){
 		if (typeof subs == 'function') {
 			if (subs === fn) delete events[topic]
 		} else {
-			subs = events[topic] = subs.filter(function(ƒ){
-				return ƒ !== fn
+			subs = events[topic] = subs.filter(function(fn){
+				return fn !== fn
 			})
 			// tidy
 			if (subs.length == 1) events[topic] = subs[0]

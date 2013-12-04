@@ -38,9 +38,9 @@ Emitter.prototype.emit = function(topic){
 		case 3: while (i) cbs[--i].call(cbs[--i], arguments[1], arguments[2]);break
 		case 4: while (i) cbs[--i].call(cbs[--i], arguments[1], arguments[2], arguments[3]);break
 		default:while (i) {
-			var ƒ = cbs[--i]
+			var fn = cbs[--i]
 			topic = cbs[--i]
-			call.apply(ƒ, arguments)
+			call.apply(fn, arguments)
 		}
 	}
 	return this
@@ -143,18 +143,18 @@ Emitter.prototype.once = function(topic, fn, ctx){
  *
  * @param {Emitter} emitter
  * @param {String} topic
- * @param {Function} [ƒ]
+ * @param {Function} [fn]
  * @param {Any} [ctx]
  * @return {Boolean}
  */
 
-Emitter.hasSubscription = function(emitter, topic, ƒ, ctx){
+Emitter.hasSubscription = function(emitter, topic, fn, ctx){
 	var cbs = emitter._events
 	if (!cbs) return false
 	if (!(cbs = cbs[topic])) return false
-	if (!ƒ) return true
+	if (!fn) return true
 	for (var i = 0, len = cbs.length; i < len; i+=2) {
-		if (cbs[i + 1] === ƒ) {
+		if (cbs[i + 1] === fn) {
 			if (ctx == null || ctx === cbs[i]) return true
 		}
 	}
