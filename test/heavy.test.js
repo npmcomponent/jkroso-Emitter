@@ -21,24 +21,24 @@ function notSubscribed(topic, fn, ctx){
 
 var emitter
 var spy
-beforeEach(function () {
+beforeEach(function(){
 	emitter = new Emitter
 	spy = chai.spy()
 })
 
-describe('Instantiate', function () {
-	it('Should be an instance of Emitter', function () {
+describe('Instantiate', function(){
+	it('Should be an instance of Emitter', function(){
 		new Emitter().should.be.an.instanceOf(Emitter)
 	})
 })
 
-describe('Mixin', function () {
-	it('should return the target object', function () {
+describe('Mixin', function(){
+	it('should return the target object', function(){
 		var o = {}
 		Emitter(o).should.equal(o)
 	})
 
-	it('should look like an Emitter instance', function () {
+	it('should look like an Emitter instance', function(){
 		Emitter({}).should.have.keys([
 			'emit',
 			'on',
@@ -48,38 +48,38 @@ describe('Mixin', function () {
 	})
 })
 
-describe('.on(events, fn, context)', function () {
-	it('should register the callback', function () {
+describe('.on(events, fn, context)', function(){
+	it('should register the callback', function(){
 		emitter.on('test', noopA)
 		subscribed('test', noopA)
 	})
 
-	it('should be able to subscribe multiple functions per event', function () {
+	it('should be able to subscribe multiple functions per event', function(){
 		emitter.on('test', noopA, emitter)
 		emitter.on('test', noopB, emitter)
 		subscribed('test', noopA, emitter)
 		subscribed('test', noopB, emitter)
 	})
 
-	it('should default the context to the current this value', function () {
+	it('should default the context to the current this value', function(){
 		emitter.on('test', noopA)
 		subscribed('test', noopA, emitter)
 	})
 
-	it('should return `this`', function () {
+	it('should return `this`', function(){
 		emitter.on('test', noopA).should.equal(emitter)
 	})
 })
 
-describe('.emit(event [, ...])', function () {
-	it('Should fire in the order functions were subscribed', function () {
+describe('.emit(event [, ...])', function(){
+	it('Should fire in the order functions were subscribed', function(){
 		var c = 0
 		
-		emitter.on('emitter', function () {
+		emitter.on('emitter', function(){
 			(++c).should.equal(1)
 		})
 		
-		emitter.on('emitter', function () {
+		emitter.on('emitter', function(){
 			(++c).should.equal(2)
 		})
 		
@@ -87,73 +87,73 @@ describe('.emit(event [, ...])', function () {
 		c.should.equal(2)
 	})
 	
-	it('Should call functions with their specified context', function (done) {
-		emitter.on('test', function (d) {
+	it('Should call functions with their specified context', function(done){
+		emitter.on('test', function(d){
 			this.should.equal(sentinel)
 			done()
 		}, sentinel)
 		emitter.emit('test')
 	})
 	
-	it('should pass data to each handler', function (done) {
-		emitter.on('test', function (d) {
+	it('should pass data to each handler', function(done){
+		emitter.on('test', function(d){
 			d.should.equal(sentinel)
 			done()
 		})
 		emitter.emit('test', sentinel)
 	})
 
-	it('should pass all extra arguments to the handler', function () {
-		emitter.on('emitter', function () {
-			arguments.should.deep.equal([1,2,3,4,5])
+	it('should pass all extra arguments to the handler', function(){
+		emitter.on('emitter', function(){
+			[].slice.call(arguments).should.eql([1,2,3,4,5])
 		})
 		emitter.emit('emitter', 1,2,3,4,5)
 
-		emitter.on('b',function () {
-			arguments.should.deep.equal([1,2])
+		emitter.on('b',function(){
+			[].slice.call(arguments).should.eql([1,2])
 		})
 		emitter.emit('b', 1,2)
 	})
 
-	it('should return `this`', function () {
+	it('should return `this`', function(){
 		emitter.emit('test', noopA).should.equal(emitter)
 	})
 })
 
-describe('.off()', function () {
-	it('Should remove all topics', function () {
-		emitter.on('rad', function () {})
-		emitter.on('test', function () {})
+describe('.off()', function(){
+	it('Should remove all topics', function(){
+		emitter.on('rad', function(){})
+		emitter.on('test', function(){})
 		emitter.off()
 		Object.keys(emitter._events).length.should.equal(0)
 	})
 
-	it('should return `this`', function () {
+	it('should return `this`', function(){
 		emitter.off().should.equal(emitter)
 	})
 })
 
-describe('.off(topic)', function () {
-	it('Should clear all under the given topic', function () {
-		emitter.on('test', function () {})
-		emitter.on('test', function () {})
+describe('.off(topic)', function(){
+	it('Should clear all under the given topic', function(){
+		emitter.on('test', function(){})
+		emitter.on('test', function(){})
 		emitter.off('test')
 		should.not.exist(emitter._events.test)
 	})
 
-	it('should return `this`', function () {
+	it('should return `this`', function(){
 		emitter.off('test').should.equal(emitter)
 	})
 })
 
-describe('.off(events, fn)', function () {
-	it('Should remove subscriptions which match both the topic and fn', function () {
+describe('.off(events, fn)', function(){
+	it('Should remove subscriptions which match both the topic and fn', function(){
 		emitter.on('test', noopA)
 		emitter.off('test', noopA)
 		notSubscribed('test', noopA, emitter)
 	})
 
-	it('Should not remove other subscriptions', function () {
+	it('Should not remove other subscriptions', function(){
 		emitter.on('test', noopA)
 		emitter.on('test', noopB)
 		emitter.off('test', noopA)
@@ -161,20 +161,20 @@ describe('.off(events, fn)', function () {
 		subscribed('test', noopB, emitter)
 	})
 
-	it('should remove all matching functions', function () {
+	it('should remove all matching functions', function(){
 		emitter.on('test', noopA, sentinel)
 		emitter.on('test', noopA, noopB)
 		emitter.off('test', noopA)
 		notSubscribed('test', noopA)
 	})
 
-	it('should return `this`', function () {
+	it('should return `this`', function(){
 		emitter.off('test', noopA).should.equal(emitter)
 	})
 })
 
-describe('.off(topic, fn, context)', function () {
-	it('should remove only the subscriptions which match both context and fn', function () {
+describe('.off(topic, fn, context)', function(){
+	it('should remove only the subscriptions which match both context and fn', function(){
 		emitter.on('test', noopA, noopB)
 		emitter.on('test', noopA, sentinel)
 		emitter.off('test', noopA, sentinel)
@@ -182,15 +182,15 @@ describe('.off(topic, fn, context)', function () {
 		subscribed('test', noopA, noopB)
 	})
 
-	it('should return `this`', function () {
+	it('should return `this`', function(){
 		emitter.off('test', noopA, sentinel).should.equal(emitter)
 	})
 })
 
-describe('.once()', function () {
-	it('should remove the subscription after once call', function () {
+describe('.once()', function(){
+	it('should remove the subscription after once call', function(){
 		var c = 0
-		emitter.once('test', function () {
+		emitter.once('test', function(){
 			c++
 		})
 		emitter.emit('test')
@@ -198,36 +198,36 @@ describe('.once()', function () {
 		c.should.equal(1)
 	})
 
-	it('should return `this`', function () {
+	it('should return `this`', function(){
 		emitter.once('test', noopA).should.equal(emitter)
 	})
 })
 
-describe('.hasSubscription()', function () {
-	describe('with just a `topic`', function () {
-		it('should detect any subscription on `topic`', function () {
+describe('.hasSubscription()', function(){
+	describe('with just a `topic`', function(){
+		it('should detect any subscription on `topic`', function(){
 			emitter.on('test', spy)		
 			Emitter.hasSubscription(emitter, 'test').should.be.true		
 			Emitter.hasSubscription(emitter, 'a').should.be.false
 		})
 	})
 
-	describe('with a `topic` and a `function`', function () {
-		it('should detect a match of `topic` and `function`', function () {
+	describe('with a `topic` and a `function`', function(){
+		it('should detect a match of `topic` and `function`', function(){
 			emitter.on('test', spy)		
 			Emitter.hasSubscription(emitter, 'test', spy).should.be.true
 			Emitter.hasSubscription(emitter, 'test', function(){}).should.be.false
 		})
 	})
 
-	describe('with the a `context` argument aswell', function () {
-		it('should also check that matches', function () {
+	describe('with the a `context` argument aswell', function(){
+		it('should also check that matches', function(){
 			emitter.on('test', spy, sentinel)
 			Emitter.hasSubscription(emitter, 'test', spy, sentinel).should.be.true
 			Emitter.hasSubscription(emitter, 'test', spy, {}).should.be.false
 		})
 
-		it('should continue searching after failing only on `ctx`', function () {
+		it('should continue searching after failing only on `ctx`', function(){
 			emitter.on('a', spy, sentinel)
 			emitter.on('a', spy, {})
 			emitter.on('b', spy, {})
