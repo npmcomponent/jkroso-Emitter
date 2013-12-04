@@ -11,18 +11,6 @@
     "signal",
     "message"
   ],
-  "scripts": [
-    "heavy.js",
-    "index.js",
-    "light.js"
-  ],
-  "license": "MIT",
-  "development": {
-    "visionmedia/mocha": "1.12.1",
-    "component/inherit": "0.0.2",
-    "chaijs/chai-spies": "0.5.1",
-    "jkroso/serve": "1.5.1",
-    "chaijs/chai": "1.7.2",
-    "vesln/b": "fc64f24"
-  }
+  "scripts": ["heavy.js", "index.js", "light.js"],
+  "license": "MIT"
 }

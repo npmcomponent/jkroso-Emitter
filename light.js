@@ -5,14 +5,14 @@
  * implementing simple but hot things like streams. 
  */
 
-var mixin = require('merge')
+var merge = require('merge')
 var own = {}.hasOwnProperty
 var call = Function.call
 
 module.exports = Emitter
 
 function Emitter(obj){
-	if (obj) return mixin(obj, Emitter.prototype)
+	if (obj) return merge(obj, Emitter.prototype)
 }
 
 Emitter.prototype.emit = function(topic){
@@ -56,21 +56,11 @@ Emitter.prototype.on = function(topic, fn){
 	if (typeof events[topic] == 'function') {
 		events[topic] = [events[topic], fn]
 	} else if (events[topic]) {
-		events[topic].push(fn)
+		events[topic] = events[topic].concat(fn)
 	} else {
 		events[topic] = fn
 	}
 	return this
-}
-
-function clone(o){
-	var c = {}
-	for (var k in o) {
-		c[k] = typeof o[k] == 'object'
-			? o[k].slice()
-			: o[k]
-	}
-	return c
 }
 
 Emitter.prototype.off = function(topic, fn){
@@ -120,4 +110,8 @@ Emitter.subscriptions = function(emitter, topic){
 	if (!fns || !(fns = fns[topic])) return []
 	if (typeof fns == 'function') return [fns]
 	return fns.slice()
+}
+
+function clone(obj){
+	return merge({}, obj)
 }
