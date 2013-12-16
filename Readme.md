@@ -4,7 +4,7 @@ A simple but optimized event emitter.
 
 ## Features
 
-- inherited subscriptions:  
+- __inherited subscriptions:__
 This allows you to define subscriptions on the class rather than on each instance of a class which is both more efficient in terms of memery and sometimes cleaner too.
 
 ## Installation
@@ -31,7 +31,7 @@ var Emitter = require('emitter')
 
   Process `event`. All arguments after `topic` will
   be passed to all listeners
-  
+
 ```js
 emitter.emit('event', new Date)
 ```
@@ -39,7 +39,7 @@ emitter.emit('event', new Date)
 ### Emitter#on(topic, fn)
 
   Add a subscription under a topic name
-  
+
 ```js
 emitter.on('event', function(data){})
 ```
@@ -47,7 +47,7 @@ emitter.on('event', function(data){})
 ### Emitter#off([topic], [fn])
 
   Remove subscriptions
-  
+
 ```js
 emitter.off()            // clears all listeners
 emitter.off('topic')     // clears all `topic` listeners

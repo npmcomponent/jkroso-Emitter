@@ -5,12 +5,7 @@
   "dependencies": {
     "yields/merge": "1.0.0"
   },
-  "keywords": [
-    "event",
-    "emitter",
-    "signal",
-    "message"
-  ],
-  "scripts": ["heavy.js", "index.js", "light.js"],
+  "keywords": ["event", "emitter", "signal", "message"],
+  "scripts": ["index.js"],
   "license": "MIT"
 }
