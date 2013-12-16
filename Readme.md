@@ -1,76 +1,72 @@
 # Emitter
 
-A simple event emitter.
+A simple but optimized event emitter.
 
 ## Features
 
 - inherited subscriptions:  
 This allows you to define subscriptions on the class rather than on each instance of a class which is both more efficient in terms of memery and sometimes cleaner too.
 
-- each subscription can set its own context:  
-This just means you don't have to `.bind()` functions as often which saves memory and often looks a little nicer. This feature is not present in the [light](light.js) implementation.
-
 ## Installation
 
-_With [component](//github.com/component/component), [packin](//github.com/jkroso/packin) or [npm](//github.com/isaacs/npm)_  
+With your favourite package manager:
 
-    $ {package mananger} install jkroso/emitter
+- [packin](//github.com/jkroso/packin): `packin add jkroso/emitter`
+- [component](//github.com/component/component#installing-packages): `component install jkroso/emitter`
+- [npm](//npmjs.org/doc/cli/npm-install.html): `npm install jkroso/emitter`
 
 then in your app:
 
 ```javascript
-var Emitter = require('emitter/heavy')
+var Emitter = require('emitter')
 ```
 
 ## API
 
-### Emitter()
+### Emitter([obj])
 
-  Generate a new Emitter or mixin methods to `obj`
+  Emitter constructor. Can optionally also act as a mixin
 
-```js
-var emitter = new Emitter
-var emitter = Emitter({})
-```
+### Emitter#emit(topic, [...args])
 
-### Emitter#emit(topic:String, [...]:Any)
-
-  Generate an event. All arguments after `topic` will be passed to
-  the handlers
-
+  Process `event`. All arguments after `topic` will
+  be passed to all listeners
+  
 ```js
 emitter.emit('event', new Date)
 ```
 
-### Emitter#on(topic:String, fn:Function, context:Object)
+### Emitter#on(topic, fn)
 
   Add a subscription under a topic name
-
+  
 ```js
 emitter.on('event', function(data){})
-emitter.on('event') // implies emitter.on('event', emitter.onEvent)
-emitter.on('event', function(){this === emitter}, emitter)
-emitter.on('event', function(){this === emitter}) // the current context is the default
 ```
 
-### Emitter#off([topic]:String, [fn]:Function, [context]:Any)
+### Emitter#off([topic], [fn])
 
   Remove subscriptions
-
+  
 ```js
-emitter.off() // clears all topics
-emitter.off('topic') // clears all handlers from the topic 'topic'
-emitter.off('topic', fn) // as above but only if the handler === fn
-emitter.off('topic', fn, window) // as above but only if the context is `window`
+emitter.off()            // clears all listeners
+emitter.off('topic')     // clears all `topic` listeners
+emitter.off('topic', fn) // as above but only where `listener == fn`
 ```
 
-### Emitter#once(topic:String, fn:Function, [ctx]:Any)
+### Emitter#once(topic, fn)
 
-  same as `.on()` but removes the subscription after
-  the first time its triggered
+  subscribe `fn` but remove if after its first invocation
 
-### Emitter.hasSubscription(emitter:Emitter, topic:String, [ƒ]:Function, [ctx]:Any)
+### Emitter.hasSubscription(emitter, topic, [fn])
 
-  test if a subscription is present on `emitter`
+  see if `emitter` has any subscriptions matching
+  `topic` and optionally also `fn`
 
-## [License](License)
+### Emitter.subscriptions(emitter, topic)
+
+  get an Array of subscriptions for `topic`
+
+## Running the tests
+
+run `make` then navigate your browser to [test/index.html](test/index.html)

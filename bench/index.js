@@ -5,7 +5,7 @@ var basename = path.basename
 var b = require('b')
 
 var file = __dirname + '/run.js'
-var imps = ['heavy.js', 'light.js', 'bench/node.js']
+var imps = ['index.js', 'bench/node.js']
 
 function run(subs){
 	var batch = b(subs+' subscriptions').reporter('table')

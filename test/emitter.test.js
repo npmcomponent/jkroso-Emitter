@@ -1,7 +1,7 @@
 
-var Emitter = require('../light')
 var inherit = require('inherit')
 var chai = require('./chai')
+var Emitter = require('..')
 
 function noopA(){}
 function noopB(){}
@@ -20,7 +20,7 @@ function notSubscribed(topic, fn){
 	}
 }
 
-describe('light.js', function(){
+describe('Emitter', function(){
 	var spy
 	beforeEach(function(){
 		spy = chai.spy()
