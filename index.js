@@ -1,5 +1,5 @@
 
-var merge = require('merge')
+var merge = require('yields-merge')
 var own = Object.hasOwnProperty
 var call = Function.call
 

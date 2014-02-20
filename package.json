@@ -1,20 +1,14 @@
 {
-  "name": "emitter",
-  "description": "a basic event emitter",
-  "version": "0.10.0",
+  "name": "jkroso-emitter",
+  "description": "A simple event emitter",
+  "keywords": [
+    "event",
+    "emitter",
+    "signal",
+    "message"
+  ],
   "dependencies": {
-    "merge": "yields/merge#2f357cb"
+    "yields-merge": "git://github.com/npmcomponent/yields-merge.git"
   },
-  "devDependencies": {
-    "inherit": "nathan7/inherit#f1a75b4",
-    "serve": "jkroso/serve",
-    "b": "vesln/b#3a16d17",
-    "chai-spies": "*",
-    "mocha": "*",
-    "chai": "*"
-  },
-  "keywords": ["event", "emitter"],
-  "author": "Jakeb Rosoman <jkroso@gmail.com>",
-  "repository": "git://github.com/jkroso/Emitter.git",
   "license": "MIT"
 }
